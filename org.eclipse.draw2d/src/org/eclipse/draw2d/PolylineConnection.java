@@ -13,7 +13,6 @@ package org.eclipse.draw2d;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.eclipse.draw2d.geometry.Point;
 import org.eclipse.draw2d.geometry.Rectangle;
 
 /**
@@ -42,8 +41,8 @@ public class PolylineConnection extends Polyline implements Connection,
 
 	{
 		setLayoutManager(new DelegatingLayout());
-		addPoint(new Point(0, 0));
-		addPoint(new Point(100, 100));
+		// addPoint(new Point(0, 0));
+		// addPoint(new Point(100, 100));
 	}
 
 	/**
