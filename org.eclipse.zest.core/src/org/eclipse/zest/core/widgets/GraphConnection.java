@@ -21,6 +21,7 @@ import org.eclipse.draw2d.PolygonDecoration;
 import org.eclipse.draw2d.PolylineConnection;
 import org.eclipse.draw2d.Shape;
 import org.eclipse.draw2d.geometry.Point;
+import org.eclipse.draw2d.geometry.PointList;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.widgets.Display;
@@ -60,8 +61,8 @@ public class GraphConnection extends GraphItem {
 	private boolean isDisposed = false;
 
 	private Label connectionLabel = null;
-	private PolylineArcConnection connectionFigure = null;
-	private PolylineArcConnection cachedConnectionFigure = null;
+	private PolylineConnection connectionFigure = null;
+	private PolylineConnection cachedConnectionFigure = null;
 	private Connection sourceContainerConnectionFigure = null;
 	private Connection targetContainerConnectionFigure = null;
 
@@ -597,9 +598,11 @@ public class GraphConnection extends GraphItem {
 		if (highlighted) {
 			connectionShape.setForegroundColor(getHighlightColor());
 			connectionShape.setLineWidth(getLineWidth() * 2);
+			connectionShape.setAlpha(getHighlightColor().getAlpha());
 		} else {
 			connectionShape.setForegroundColor(getLineColor());
 			connectionShape.setLineWidth(getLineWidth());
+			connectionShape.setAlpha(getLineColor().getAlpha());
 		}
 
 		if (connection instanceof PolylineArcConnection) {
@@ -628,7 +631,7 @@ public class GraphConnection extends GraphItem {
 		connection.setToolTip(toolTip);
 	}
 
-	private PolylineArcConnection createFigure() {
+	protected PolylineConnection createFigure() {
 		/*
 		 * if ((sourceNode.getParent()).getItemType() == GraphItem.CONTAINER) {
 		 * GraphContainer container = (GraphContainer) sourceNode.getParent();
@@ -646,8 +649,8 @@ public class GraphConnection extends GraphItem {
 
 	}
 
-	private PolylineArcConnection doCreateFigure() {
-		PolylineArcConnection connectionFigure = cachedOrNewConnectionFigure();
+	private PolylineConnection doCreateFigure() {
+		PolylineConnection connectionFigure = cachedOrNewConnectionFigure();
 		ChopboxAnchor sourceAnchor = null;
 		ChopboxAnchor targetAnchor = null;
 		this.connectionLabel = new Label();
@@ -670,8 +673,10 @@ public class GraphConnection extends GraphItem {
 				}
 			};
 		} else {
-			if (curveDepth != 0) {
-				connectionFigure.setDepth(this.curveDepth);
+			if (connectionFigure instanceof PolylineArcConnection
+					&& curveDepth != 0) {
+				((PolylineArcConnection) connectionFigure)
+						.setDepth(this.curveDepth);
 			}
 			sourceAnchor = new RoundedChopboxAnchor(
 					getSource().getNodeFigure(), 8);
@@ -688,7 +693,7 @@ public class GraphConnection extends GraphItem {
 		return connectionFigure;
 	}
 
-	private PolylineArcConnection cachedOrNewConnectionFigure() {
+	protected PolylineConnection cachedOrNewConnectionFigure() {
 		return cachedConnectionFigure == null ? new PolylineArcConnection()
 				: cachedConnectionFigure;
 	}
@@ -705,12 +710,13 @@ public class GraphConnection extends GraphItem {
 				ZestStyles.CONNECTIONS_DIRECTED);
 	}
 
-	class GraphLayoutConnection implements LayoutRelationship {
+	public class GraphLayoutConnection implements LayoutRelationship {
 
 		Object layoutInformation = null;
 
 		public void clearBendPoints() {
 			// @tag TODO : add bendpoints
+			connectionFigure.getPoints().removeAllPoints();
 		}
 
 		public LayoutEntity getDestinationInLayout() {
@@ -732,6 +738,25 @@ public class GraphConnection extends GraphItem {
 
 		public void setBendPoints(LayoutBendPoint[] bendPoints) {
 			// @tag TODO : add bendpoints
+			PointList points = new PointList();
+
+			points.addPoint(
+					getSource().getLocation().x
+							+ getSource().getSize().width / 2,
+					getSource().getLocation().y
+							+ getSource().getSize().height / 2);
+			for (LayoutBendPoint p : bendPoints) {
+				if (p.getIsControlPoint()) {
+					points.addPoint((int) p.getX(), (int) p.getY());
+				}
+			}
+			points.addPoint(
+					getDestination().getLocation().x
+							+ getDestination().getSize().width / 2,
+					getDestination().getLocation().y
+							+ getDestination().getSize().height / 2);
+
+			connectionFigure.setPoints(points);
 		}
 
 		public void setLayoutInformation(Object layoutInformation) {
@@ -750,5 +775,17 @@ public class GraphConnection extends GraphItem {
 
 	IFigure getFigure() {
 		return this.getConnectionFigure();
+	}
+
+	protected void setHighlighted(boolean highlighted) {
+		this.highlighted = highlighted;
+	}
+
+	protected Label getConnectionLabel() {
+		return connectionLabel;
+	}
+
+	protected void setConnectionLabel(Label connectionLabel) {
+		this.connectionLabel = connectionLabel;
 	}
 }

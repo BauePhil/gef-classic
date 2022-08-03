@@ -13,6 +13,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
+import org.eclipse.draw2d.IFigure;
 import org.eclipse.jface.viewers.DoubleClickEvent;
 import org.eclipse.jface.viewers.IContentProvider;
 import org.eclipse.jface.viewers.ISelection;
@@ -33,8 +34,11 @@ import org.eclipse.zest.core.viewers.internal.GraphModelEntityRelationshipFactor
 import org.eclipse.zest.core.viewers.internal.GraphModelFactory;
 import org.eclipse.zest.core.viewers.internal.IStylingGraphModelFactory;
 import org.eclipse.zest.core.viewers.internal.ZoomManager;
+import org.eclipse.zest.core.widgets.CGraphNode;
 import org.eclipse.zest.core.widgets.Graph;
+import org.eclipse.zest.core.widgets.GraphConnection;
 import org.eclipse.zest.core.widgets.GraphItem;
+import org.eclipse.zest.core.widgets.GraphNode;
 import org.eclipse.zest.layouts.LayoutAlgorithm;
 
 /**
@@ -166,6 +170,18 @@ public class GraphViewer extends AbstractStructuredGraphViewer implements
 	public void setNodeStyle(int nodeStyle) {
 		super.setNodeStyle(nodeStyle);
 		this.graph.setNodeStyle(nodeStyle);
+	}
+	
+	
+	@Override
+	protected GraphNode createNodeObject(final Graph graphModel, final int style, IFigure figure) {
+		return new CGraphNode(graphModel, style, figure);
+	}
+
+	@Override
+	protected GraphConnection createConnectionObject(final Graph graphModel, final int style,
+			final GraphNode source, final GraphNode destination) {
+		return new GraphConnection(graphModel, style, source, destination);
 	}
 
 	public void setContentProvider(IContentProvider contentProvider) {

@@ -263,7 +263,7 @@ public abstract class AbstractStructuredGraphViewer extends
 		GraphNode node = this.getGraphModelNode(element);
 		if (node == null) {
 			if (figure != null) {
-				node = new CGraphNode((Graph) getControl(), SWT.NONE, figure);
+				node = createNodeObject((Graph) getControl(), SWT.NONE, figure);
 				this.nodesMap.put(element, node);
 				node.setData(element);
 			} else {
@@ -275,12 +275,17 @@ public abstract class AbstractStructuredGraphViewer extends
 		return node;
 	}
 
+	/** Implement and return the new node object, enables to define custom graph nodes*/
+	protected abstract GraphNode createNodeObject(final Graph graphModel, final int style, IFigure figure);
+	
+	/** Implement and return the new connection object, enables to define custom graph connections*/
+	protected abstract GraphConnection createConnectionObject(final Graph graphModel, final int style, final GraphNode source, final GraphNode destination);
+
 	GraphConnection addGraphModelConnection(Object element, GraphNode source,
 			GraphNode target) {
 		GraphConnection connection = this.getGraphModelConnection(element);
 		if (connection == null) {
-			connection = new GraphConnection((Graph) getControl(), SWT.NONE,
-					source, target);
+			connection = createConnectionObject(getGraphControl(), SWT.NONE, source, target);
 			this.connectionsMap.put(element, connection);
 			connection.setData(element);
 		}
