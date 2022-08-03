@@ -64,7 +64,7 @@ public class GraphNode extends GraphItem {
 	protected Dimension size;
 	private Font font;
 	private boolean cacheLabel;
-	private boolean visible = true;
+	protected boolean visible = true;
 	private LayoutEntity layoutEntity;
 
 	protected Graph graph;
@@ -725,7 +725,7 @@ public class GraphNode extends GraphItem {
 		return parent;
 	}
 
-	boolean isHighlighted() {
+	public boolean isHighlighted() {
 		return highlighted > 0;
 	}
 
@@ -933,7 +933,7 @@ public class GraphNode extends GraphItem {
 
 	}
 
-	IFigure getFigure() {
+	protected IFigure getFigure() {
 		if (this.nodeFigure == null) {
 			initFigure();
 		}
