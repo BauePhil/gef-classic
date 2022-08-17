@@ -38,7 +38,6 @@ import org.eclipse.swt.events.DisposeEvent;
 import org.eclipse.swt.events.DisposeListener;
 import org.eclipse.swt.events.PaintEvent;
 import org.eclipse.swt.events.PaintListener;
-import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.graphics.Color;
@@ -1173,7 +1172,7 @@ public class Graph extends FigureCanvas implements IContainer {
 		}
 	}
 
-	private ScalableFigure createLayers() {
+	protected IFigure createLayers() {
 		rootlayer = new ScalableFreeformLayeredPane();
 		rootlayer.setLayoutManager(new FreeformLayout());
 		zestRootLayer = new ZestRootLayer();
