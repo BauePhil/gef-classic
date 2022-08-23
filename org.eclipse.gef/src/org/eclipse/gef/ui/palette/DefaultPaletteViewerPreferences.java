@@ -233,13 +233,13 @@ public class DefaultPaletteViewerPreferences implements
 	 */
 	protected void handlePreferenceStorePropertyChanged(String property) {
 		if (property.equals(PREFERENCE_LAYOUT)) {
-			firePropertyChanged(property, new Integer(getLayoutSetting()));
+			firePropertyChanged(property, Integer.valueOf(getLayoutSetting()));
 		} else if (property.equals(PREFERENCE_AUTO_COLLAPSE)) {
-			firePropertyChanged(property, new Integer(getAutoCollapseSetting()));
+			firePropertyChanged(property, Integer.valueOf(getAutoCollapseSetting()));
 		} else if (property.equals(PREFERENCE_FONT)) {
 			firePropertyChanged(property, getFontData());
 		} else {
-			firePropertyChanged(property, new Boolean(
+			firePropertyChanged(property, Boolean.valueOf(
 					useLargeIcons(convertPreferenceNameToLayout(property))));
 		}
 	}

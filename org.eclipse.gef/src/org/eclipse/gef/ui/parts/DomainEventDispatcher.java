@@ -69,11 +69,11 @@ public class DomainEventDispatcher extends SWTEventDispatcher {
 		private AccessibleEditPart get(int childID) {
 			if (childID == ACC.CHILDID_SELF || childID == ACC.CHILDID_NONE)
 				if (getViewer().getContents() != null)
-					return (AccessibleEditPart) getViewer().getContents()
+					return getViewer().getContents()
 							.getAdapter(AccessibleEditPart.class);
 				else
 					return null;
-			return (AccessibleEditPart) accessibles.get(new Integer(childID));
+			return (AccessibleEditPart) accessibles.get(Integer.valueOf(childID));
 		}
 
 		/**
@@ -86,7 +86,7 @@ public class DomainEventDispatcher extends SWTEventDispatcher {
 			EditPart part = getViewer().findObjectAt(new Point(p.x, p.y));
 			if (part == null)
 				return;
-			AccessibleEditPart acc = (AccessibleEditPart) part
+			AccessibleEditPart acc = part
 					.getAdapter(AccessibleEditPart.class);
 			if (acc != null)
 				e.childID = acc.getAccessibleID();
@@ -132,7 +132,7 @@ public class DomainEventDispatcher extends SWTEventDispatcher {
 		 * @see AccessibleControlListener#getFocus(AccessibleControlEvent)
 		 */
 		public void getFocus(AccessibleControlEvent e) {
-			AccessibleEditPart acc = (AccessibleEditPart) getViewer()
+			AccessibleEditPart acc = getViewer()
 					.getFocusEditPart().getAdapter(AccessibleEditPart.class);
 			if (acc != null)
 				e.childID = acc.getAccessibleID();
@@ -458,11 +458,11 @@ public class DomainEventDispatcher extends SWTEventDispatcher {
 	}
 
 	void putAccessible(AccessibleEditPart acc) {
-		accessibles.put(new Integer(acc.getAccessibleID()), acc);
+		accessibles.put(Integer.valueOf(acc.getAccessibleID()), acc);
 	}
 
 	void removeAccessible(AccessibleEditPart acc) {
-		accessibles.remove(new Integer(acc.getAccessibleID()));
+		accessibles.remove(Integer.valueOf(acc.getAccessibleID()));
 	}
 
 	/**

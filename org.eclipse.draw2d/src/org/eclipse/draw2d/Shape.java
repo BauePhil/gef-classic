@@ -378,7 +378,7 @@ public abstract class Shape extends Figure {
 	 */
 	public float[] getLineDash() {
 		if (lineAttributes.dash != null) {
-			return (float[]) lineAttributes.dash.clone();
+			return lineAttributes.dash.clone();
 		} else {
 			return null;
 		}
@@ -427,11 +427,11 @@ public abstract class Shape extends Figure {
 	public void setAlpha(int value) {
 		if (alpha != null) {
 			if (alpha.intValue() != value) {
-				alpha = new Integer(value);
+				alpha = Integer.valueOf(value);
 				repaint();
 			}
 		} else {
-			alpha = new Integer(value);
+			alpha = Integer.valueOf(value);
 			repaint();
 		}
 	}
@@ -459,11 +459,11 @@ public abstract class Shape extends Figure {
 	public void setAntialias(int value) {
 		if (antialias != null) {
 			if (antialias.intValue() != value) {
-				antialias = new Integer(value);
+				antialias = Integer.valueOf(value);
 				repaint();
 			}
 		} else {
-			antialias = new Integer(value);
+			antialias = Integer.valueOf(value);
 			repaint();
 		}
 	}
@@ -588,7 +588,7 @@ public abstract class Shape extends Figure {
 	 */
 	public void setLineDash(float[] dash) {
 		if ((dash != null) && !dash.equals(lineAttributes.dash)) {
-			lineAttributes.dash = (float[]) dash.clone();
+			lineAttributes.dash = dash.clone();
 			repaint();
 		} else if ((dash == null) && (lineAttributes.dash != null)) {
 			lineAttributes.dash = null;

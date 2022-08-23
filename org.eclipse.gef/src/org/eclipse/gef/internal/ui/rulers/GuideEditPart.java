@@ -105,7 +105,7 @@ public class GuideEditPart extends AbstractGraphicalEditPart {
 		guideLineFig = createGuideLineFigure();
 		getGuideLayer().add(getGuideLineFigure());
 		getGuideLayer().setConstraint(getGuideLineFigure(),
-				new Boolean(isHorizontal()));
+				Boolean.valueOf(isHorizontal()));
 		return new GuideFigure(isHorizontal());
 	}
 
@@ -281,7 +281,7 @@ public class GuideEditPart extends AbstractGraphicalEditPart {
 
 	public void updateLocationOfFigures(int position) {
 		getRulerEditPart().setLayoutConstraint(this, getFigure(),
-				new Integer(position));
+				Integer.valueOf(position));
 		Point guideFeedbackLocation = getGuideLineFigure().getBounds()
 				.getLocation();
 		if (isHorizontal()) {
