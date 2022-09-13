@@ -4,7 +4,7 @@
  * available under the terms of the Eclipse Public License v1.0 which
  * accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors: The Chisel Group, University of Victoria
  ******************************************************************************/
 package org.eclipse.zest.core.widgets;
@@ -59,9 +59,9 @@ import org.eclipse.zest.layouts.constraints.LayoutConstraint;
 
 /**
  * Holds the nodes and connections for the graph.
- * 
+ *
  * @author Chris Callendar
- * 
+ *
  * @author Ian Bull
  */
 public class Graph extends FigureCanvas implements IContainer {
@@ -106,15 +106,15 @@ public class Graph extends FigureCanvas implements IContainer {
 	private Dimension preferredSize = null;
 	int style = 0;
 
-	private ScalableFreeformLayeredPane rootlayer;
-	private ZestRootLayer zestRootLayer;
+	protected ScalableFreeformLayeredPane rootlayer;
+	protected ZestRootLayer zestRootLayer;
 
 	private boolean hasPendingLayoutRequest;
 
 	/**
 	 * Constructor for a Graph. This widget represents the root of the graph, and
 	 * can contain graph items such as graph nodes and graph connections.
-	 * 
+	 *
 	 * @param parent
 	 * @param style
 	 */
@@ -200,7 +200,7 @@ public class Graph extends FigureCanvas implements IContainer {
 	/**
 	 * This adds a listener to the set of listeners that will be called when a
 	 * selection event occurs.
-	 * 
+	 *
 	 * @param selectionListener
 	 */
 	public void addSelectionListener(SelectionListener selectionListener) {
@@ -219,7 +219,7 @@ public class Graph extends FigureCanvas implements IContainer {
 	 * Gets a list of the GraphModelNode children objects under the root node in
 	 * this diagram. If the root node is null then all the top level nodes are
 	 * returned.
-	 * 
+	 *
 	 * @return List of GraphModelNode objects
 	 */
 	public List getNodes() {
@@ -228,7 +228,7 @@ public class Graph extends FigureCanvas implements IContainer {
 
 	/**
 	 * Adds a new constraint adapter to the list of constraint adapters
-	 * 
+	 *
 	 * @param constraintAdapter
 	 */
 	public void addConstraintAdapter(ConstraintAdapter constraintAdapter) {
@@ -237,7 +237,7 @@ public class Graph extends FigureCanvas implements IContainer {
 
 	/**
 	 * Sets the constraint adapters on this model
-	 * 
+	 *
 	 * @param constraintAdapters
 	 */
 	public void setConstraintAdapters(List /* ConstraintAdapters */ constraintAdapters) {
@@ -246,7 +246,7 @@ public class Graph extends FigureCanvas implements IContainer {
 
 	/**
 	 * Gets the root layer for this graph
-	 * 
+	 *
 	 * @return
 	 */
 	public ScalableFigure getRootLayer() {
@@ -255,7 +255,7 @@ public class Graph extends FigureCanvas implements IContainer {
 
 	/**
 	 * Sets the default connection style.
-	 * 
+	 *
 	 * @param connection style the connection style to set
 	 * @see org.eclipse.mylar.zest.core.widgets.ZestStyles
 	 */
@@ -265,7 +265,7 @@ public class Graph extends FigureCanvas implements IContainer {
 
 	/**
 	 * Gets the default connection style.
-	 * 
+	 *
 	 * @return the connection style
 	 * @see org.eclipse.mylar.zest.core.widgets.ZestStyles
 	 */
@@ -275,7 +275,7 @@ public class Graph extends FigureCanvas implements IContainer {
 
 	/**
 	 * Sets the default node style.
-	 * 
+	 *
 	 * @param nodeStyle the node style to set
 	 * @see org.eclipse.mylar.zest.core.widgets.ZestStyles
 	 */
@@ -285,7 +285,7 @@ public class Graph extends FigureCanvas implements IContainer {
 
 	/**
 	 * Gets the default node style.
-	 * 
+	 *
 	 * @return the node style
 	 * @see org.eclipse.mylar.zest.core.widgets.ZestStyles
 	 */
@@ -295,7 +295,7 @@ public class Graph extends FigureCanvas implements IContainer {
 
 	/**
 	 * Gets the list of GraphModelConnection objects.
-	 * 
+	 *
 	 * @return list of GraphModelConnection objects
 	 */
 	public List getConnections() {
@@ -304,7 +304,7 @@ public class Graph extends FigureCanvas implements IContainer {
 
 	/**
 	 * Changes the selection to the list of items
-	 * 
+	 *
 	 * @param l
 	 */
 	public void setSelection(GraphItem[] items) {
@@ -324,7 +324,7 @@ public class Graph extends FigureCanvas implements IContainer {
 
 	/**
 	 * Gets the list of currently selected GraphNodes
-	 * 
+	 *
 	 * @return Currently selected graph node
 	 */
 	public List getSelection() {
@@ -333,7 +333,7 @@ public class Graph extends FigureCanvas implements IContainer {
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see org.eclipse.swt.widgets.Widget#toString()
 	 */
 	public String toString() {
@@ -342,7 +342,7 @@ public class Graph extends FigureCanvas implements IContainer {
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see org.eclipse.mylar.zest.core.internal.graphmodel.IGraphItem#getGraphModel
 	 * ()
 	 */
@@ -382,7 +382,7 @@ public class Graph extends FigureCanvas implements IContainer {
 	/**
 	 * Sets the preferred size of the layout area. Size of ( -1, -1) uses the
 	 * current canvas size.
-	 * 
+	 *
 	 * @param width
 	 * @param height
 	 */
@@ -406,7 +406,7 @@ public class Graph extends FigureCanvas implements IContainer {
 
 	/**
 	 * Finds a figure at the location X, Y in the graph
-	 * 
+	 *
 	 * This point should be translated to relative before calling findFigureAt
 	 */
 	public IFigure getFigureAt(int x, int y) {
@@ -456,7 +456,7 @@ public class Graph extends FigureCanvas implements IContainer {
 	// /////////////////////////////////////////////////////////////////////////////////
 	class DragSupport implements MouseMotionListener, org.eclipse.draw2d.MouseListener {
 		/**
-		 * 
+		 *
 		 */
 		Graph graph = null;
 		Point lastLocation = null;
@@ -624,7 +624,8 @@ public class Graph extends FigureCanvas implements IContainer {
 				}
 				// If the figure under the mouse is the canvas, and CTRL/CMD is
 				// not being held down, then select nothing
-				if (figureUnderMouse == null || figureUnderMouse == Graph.this) {
+				if (figureUnderMouse == null
+						|| figureUnderMouse == Graph.this) {
 					if ((me.getState() & SWT.MOD1) == 0) {
 						clearSelection();
 						if (hasSelection) {
@@ -669,12 +670,14 @@ public class Graph extends FigureCanvas implements IContainer {
 					selectedItems.add(itemUnderMouse);
 					((GraphNode) itemUnderMouse).highlight();
 					fireWidgetSelectedEvent(itemUnderMouse);
-				} else if (itemUnderMouse.getItemType() == GraphItem.CONNECTION) {
+				} else if (itemUnderMouse
+						.getItemType() == GraphItem.CONNECTION) {
 					selectedItems.add(itemUnderMouse);
 					((GraphConnection) itemUnderMouse).highlight();
 					fireWidgetSelectedEvent(itemUnderMouse);
 
-				} else if (itemUnderMouse.getItemType() == GraphItem.CONTAINER) {
+				} else if (itemUnderMouse
+						.getItemType() == GraphItem.CONTAINER) {
 					selectedItems.add(itemUnderMouse);
 					((GraphContainer) itemUnderMouse).highlight();
 					fireWidgetSelectedEvent(itemUnderMouse);
@@ -692,7 +695,7 @@ public class Graph extends FigureCanvas implements IContainer {
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see org.eclipse.swt.widgets.Widget#notifyListeners(int,
 	 * org.eclipse.swt.widgets.Event)
 	 */
@@ -775,7 +778,7 @@ public class Graph extends FigureCanvas implements IContainer {
 
 	/**
 	 * Moves the edge to the highlight layer. This moves the edge above the nodes
-	 * 
+	 *
 	 * @param connection
 	 */
 	void highlightEdge(GraphConnection connection) {
@@ -787,7 +790,7 @@ public class Graph extends FigureCanvas implements IContainer {
 
 	/**
 	 * Moves the edge from the edge feedback layer back to the edge layer
-	 * 
+	 *
 	 * @param graphConnection
 	 */
 	void unhighlightEdge(GraphConnection connection) {
@@ -799,7 +802,7 @@ public class Graph extends FigureCanvas implements IContainer {
 
 	/**
 	 * Moves the node onto the node feedback layer
-	 * 
+	 *
 	 * @param node
 	 */
 	void highlightNode(GraphNode node) {
@@ -811,7 +814,7 @@ public class Graph extends FigureCanvas implements IContainer {
 
 	/**
 	 * Moves the node onto the node feedback layer
-	 * 
+	 *
 	 * @param node
 	 */
 	void highlightNode(GraphContainer node) {
@@ -823,7 +826,7 @@ public class Graph extends FigureCanvas implements IContainer {
 
 	/**
 	 * Moves the node off the node feedback layer
-	 * 
+	 *
 	 * @param node
 	 */
 	void unhighlightNode(GraphContainer node) {
@@ -835,7 +838,7 @@ public class Graph extends FigureCanvas implements IContainer {
 
 	/**
 	 * Moves the node off the node feedback layer
-	 * 
+	 *
 	 * @param node
 	 */
 	void unhighlightNode(GraphNode node) {
@@ -848,7 +851,7 @@ public class Graph extends FigureCanvas implements IContainer {
 	/**
 	 * Converts the list of GraphModelConnection objects into an array and returns
 	 * it.
-	 * 
+	 *
 	 * @return GraphModelConnection[]
 	 */
 	GraphConnection[] getConnectionsArray() {
@@ -948,7 +951,7 @@ public class Graph extends FigureCanvas implements IContainer {
 
 	/*
 	 * public void redraw() {
-	 * 
+	 *
 	 * Iterator iterator = this.getConnections().iterator(); while
 	 * (iterator.hasNext()) { GraphConnection connection = (GraphConnection)
 	 * iterator.next(); IFigure figure = connection.getFigure(); if
@@ -958,9 +961,9 @@ public class Graph extends FigureCanvas implements IContainer {
 	 * = (GraphNode) iterator.next(); IFigure figure = graphNode.getFigure(); if
 	 * (!zestRootLayer.getChildren().contains(figure)) {
 	 * zestRootLayer.addNode(graphNode.getFigure()); } }
-	 * 
+	 *
 	 * super.redraw();
-	 * 
+	 *
 	 * }
 	 */
 
@@ -997,8 +1000,8 @@ public class Graph extends FigureCanvas implements IContainer {
 	}
 
 	/*
-	 * 
-	 * 
+	 *
+	 *
 	 * /** Changes the figure for a particular node
 	 */
 	void changeNodeFigure(IFigure oldValue, IFigure newFigure, GraphNode graphItem) {
@@ -1012,7 +1015,7 @@ public class Graph extends FigureCanvas implements IContainer {
 
 	/**
 	 * Invoke all the constraint adapaters for this constraints
-	 * 
+	 *
 	 * @param object
 	 * @param constraint
 	 */
@@ -1061,7 +1064,8 @@ public class Graph extends FigureCanvas implements IContainer {
 		if (d.isEmpty()) {
 			return;
 		}
-		LayoutRelationship[] connectionsToLayout = getConnectionsToLayout(nodes);
+		LayoutRelationship[] connectionsToLayout = getConnectionsToLayout(
+				nodes);
 		LayoutEntity[] nodesToLayout = getNodesToLayout(getNodes());
 
 		try {
@@ -1088,7 +1092,7 @@ public class Graph extends FigureCanvas implements IContainer {
 	 * Adds a reveal listener to the view. Note: A reveal listener will only every
 	 * be called ONCE!!! even if a view comes and goes. There is no remove reveal
 	 * listener. This is used to defer some events until after the view is revealed.
-	 * 
+	 *
 	 * @param revealListener
 	 */
 	private void addRevealListener(final RevealListener revealListener) {
@@ -1136,7 +1140,7 @@ public class Graph extends FigureCanvas implements IContainer {
 	 * This removes the fisheye from the graph. It uses an animation to make the
 	 * fisheye shrink, and then it finally clears the fisheye layer. This assumes
 	 * that there is ever only 1 node on the fisheye layer at any time.
-	 * 
+	 *
 	 * @param fishEyeFigure The fisheye figure
 	 * @param regularFigure The regular figure (i.e. the non fisheye version)
 	 */
@@ -1170,7 +1174,7 @@ public class Graph extends FigureCanvas implements IContainer {
 
 	/**
 	 * Replaces the old fisheye figure with a new one.
-	 * 
+	 *
 	 * @param oldFigure
 	 * @param newFigure
 	 */
@@ -1194,7 +1198,7 @@ public class Graph extends FigureCanvas implements IContainer {
 	 * Add a fisheye version of the node. This works by animating the change from
 	 * the original node to the fisheyed one, and then placing the fisheye node on
 	 * the fisheye layer.
-	 * 
+	 *
 	 * @param startFigure The original node
 	 * @param endFigure   The fisheye figure
 	 * @param newBounds   The final size of the fisheyed figure

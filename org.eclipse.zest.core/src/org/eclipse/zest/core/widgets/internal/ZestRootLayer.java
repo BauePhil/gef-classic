@@ -206,10 +206,6 @@ public class ZestRootLayer extends FreeformLayer {
 		this.onHighlightBringToFront = onHighlightBringToFront;
 	}
 
-	public boolean isEdgesOnTop() {
-		return edgesOnTop;
-	}
-
 	public void setEdgesOnTop(boolean edgesOnTop) {
 		this.edgesOnTop = edgesOnTop;
 	}

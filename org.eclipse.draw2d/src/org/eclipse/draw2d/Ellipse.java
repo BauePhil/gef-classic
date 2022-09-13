@@ -19,7 +19,7 @@ import org.eclipse.draw2d.geometry.Rectangle;
 public class Ellipse extends Shape {
 	/**
 	 * Constructs a new Ellipse with the default values of a Shape.
-	 * 
+	 *
 	 * @since 2.0
 	 */
 	public Ellipse() {
@@ -28,7 +28,7 @@ public class Ellipse extends Shape {
 	/**
 	 * Returns <code>true</code> if the given point (x,y) is contained within this
 	 * ellipse.
-	 * 
+	 *
 	 * @param x the x coordinate
 	 * @param y the y coordinate
 	 * @return <code>true</code>if the given point is contained
@@ -46,20 +46,28 @@ public class Ellipse extends Shape {
 
 	/**
 	 * Fills the ellipse.
-	 * 
+	 *
 	 * @see org.eclipse.draw2d.Shape#fillShape(org.eclipse.draw2d.Graphics)
 	 */
 	protected void fillShape(Graphics graphics) {
-		graphics.fillOval(getOptimizedBounds());
+		graphics.fillOval(getBounds());
+		// graphics.fillOval(getOptimizedBounds());
 	}
 
 	/**
 	 * Outlines the ellipse.
-	 * 
+	 *
 	 * @see org.eclipse.draw2d.Shape#outlineShape(org.eclipse.draw2d.Graphics)
 	 */
 	protected void outlineShape(Graphics graphics) {
-		graphics.drawOval(getOptimizedBounds());
+		Rectangle r = Rectangle.SINGLETON.setBounds(getBounds());
+		float lw = getLineWidthFloat();
+		r.x += lw;
+		r.y += lw;
+		r.width -= 2d * lw;
+		r.height -= 2d * lw;
+		graphics.drawOval(r);
+		// graphics.drawOval(getOptimizedBounds());
 	}
 
 	private Rectangle getOptimizedBounds() {
@@ -72,6 +80,7 @@ public class Ellipse extends Shape {
 		r.y += inset1;
 		r.width -= inset1 + inset2;
 		r.height -= inset1 + inset2;
+
 		return r;
 	}
 }
