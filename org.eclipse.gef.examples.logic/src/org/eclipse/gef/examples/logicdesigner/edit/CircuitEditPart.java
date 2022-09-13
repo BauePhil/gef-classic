@@ -18,6 +18,7 @@ import org.eclipse.draw2d.ConnectionAnchor;
 import org.eclipse.draw2d.IFigure;
 import org.eclipse.draw2d.IScrollableFigure;
 import org.eclipse.draw2d.XYLayout;
+import org.eclipse.draw2d.geometry.Point;
 import org.eclipse.draw2d.geometry.Rectangle;
 
 import org.eclipse.gef.AccessibleAnchorProvider;
@@ -38,19 +39,16 @@ import org.eclipse.gef.examples.logicdesigner.figures.FigureFactory;
  * Holds a circuit, which is a container capable of holding other
  * LogicEditParts.
  */
-public class CircuitEditPart extends LogicContainerEditPart implements
-		IScrollableEditPart {
+public class CircuitEditPart extends LogicContainerEditPart implements IScrollableEditPart {
 
 	private static final String SCROLLABLE_SELECTION_FEEDBACK = "SCROLLABLE_SELECTION_FEEDBACK"; //$NON-NLS-1$
 
 	protected void createEditPolicies() {
 		super.createEditPolicies();
-		installEditPolicy(EditPolicy.LAYOUT_ROLE, new LogicXYLayoutEditPolicy(
-				(XYLayout) getContentPane().getLayoutManager()));
-		installEditPolicy(EditPolicy.SELECTION_FEEDBACK_ROLE,
-				new ContainerHighlightEditPolicy());
-		installEditPolicy(SCROLLABLE_SELECTION_FEEDBACK,
-				new ScrollableSelectionFeedbackEditPolicy());
+		installEditPolicy(EditPolicy.LAYOUT_ROLE,
+				new LogicXYLayoutEditPolicy((XYLayout) getContentPane().getLayoutManager()));
+		installEditPolicy(EditPolicy.SELECTION_FEEDBACK_ROLE, new ContainerHighlightEditPolicy());
+		installEditPolicy(SCROLLABLE_SELECTION_FEEDBACK, new ScrollableSelectionFeedbackEditPolicy());
 	}
 
 	/**
@@ -62,27 +60,24 @@ public class CircuitEditPart extends LogicContainerEditPart implements
 		return FigureFactory.createNewCircuit();
 	}
 
-	public Object getAdapter(Class key) {
+	@Override
+	public <T> T getAdapter(final Class<T> key) {
 		if (key == AutoexposeHelper.class)
-			return new ViewportAutoexposeHelper(this);
+			return key.cast(new ViewportAutoexposeHelper(this));
 		if (key == ExposeHelper.class)
-			return new ViewportExposeHelper(this);
+			return key.cast(new ViewportExposeHelper(this));
 		if (key == AccessibleAnchorProvider.class)
-			return new DefaultAccessibleAnchorProvider() {
-				public List getSourceAnchorLocations() {
-					List list = new ArrayList();
-					Vector sourceAnchors = getNodeFigure()
-							.getSourceConnectionAnchors();
-					Vector targetAnchors = getNodeFigure()
-							.getTargetConnectionAnchors();
+			return key.cast(new DefaultAccessibleAnchorProvider() {
+				@Override
+				public List<Point> getSourceAnchorLocations() {
+					List<Point> list = new ArrayList<>();
+					Vector sourceAnchors = getNodeFigure().getSourceConnectionAnchors();
+					Vector targetAnchors = getNodeFigure().getTargetConnectionAnchors();
 					for (int i = 0; i < sourceAnchors.size(); i++) {
-						ConnectionAnchor sourceAnchor = (ConnectionAnchor) sourceAnchors
-								.get(i);
-						ConnectionAnchor targetAnchor = (ConnectionAnchor) targetAnchors
-								.get(i);
-						list.add(new Rectangle(
-								sourceAnchor.getReferencePoint(), targetAnchor
-										.getReferencePoint()).getCenter());
+						ConnectionAnchor sourceAnchor = (ConnectionAnchor) sourceAnchors.get(i);
+						ConnectionAnchor targetAnchor = (ConnectionAnchor) targetAnchors.get(i);
+						list.add(new Rectangle(sourceAnchor.getReferencePoint(), targetAnchor.getReferencePoint())
+								.getCenter());
 					}
 					return list;
 				}
@@ -90,9 +85,9 @@ public class CircuitEditPart extends LogicContainerEditPart implements
 				public List getTargetAnchorLocations() {
 					return getSourceAnchorLocations();
 				}
-			};
+			});
 		if (key == MouseWheelHelper.class)
-			return new ViewportMouseWheelHelper(this);
+			return key.cast(new ViewportMouseWheelHelper(this));
 		return super.getAdapter(key);
 	}
 

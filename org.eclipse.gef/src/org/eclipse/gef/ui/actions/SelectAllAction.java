@@ -31,11 +31,10 @@ public class SelectAllAction extends Action {
 	private IWorkbenchPart part;
 
 	/**
-	 * Constructs a <code>SelectAllAction</code> and associates it with the
-	 * given part.
+	 * Constructs a <code>SelectAllAction</code> and associates it with the given
+	 * part.
 	 * 
-	 * @param part
-	 *            The workbench part associated with this SelectAllAction
+	 * @param part The workbench part associated with this SelectAllAction
 	 */
 	public SelectAllAction(IWorkbenchPart part) {
 		this.part = part;
@@ -48,19 +47,16 @@ public class SelectAllAction extends Action {
 	 * Selects all edit parts in the active workbench part.
 	 */
 	public void run() {
-		GraphicalViewer viewer = part
-				.getAdapter(GraphicalViewer.class);
+		GraphicalViewer viewer = part.getAdapter(GraphicalViewer.class);
 		if (viewer != null) {
-			viewer.setSelection(new StructuredSelection(
-					getSelectableEditParts(viewer)));
+			viewer.setSelection(new StructuredSelection(getSelectableEditParts(viewer)));
 		}
 	}
 
 	/**
 	 * Retrieves edit parts which can be selected
 	 * 
-	 * @param viewer
-	 *            from which the edit parts are to be retrieved
+	 * @param viewer from which the edit parts are to be retrieved
 	 * @return list of selectable EditParts
 	 * @since 3.5
 	 */

@@ -19,9 +19,9 @@ import org.eclipse.draw2d.geometry.Point;
  * <code>DragTrackers</code> tools and native drop listeners will make use of
  * autoexpose helpers to reveal any potential drop areas that are currently not
  * visible to the user. An example of this is scrolling a container to reveal
- * unexposed area. Another example is a bunch of stacked containers in a
- * "tab folder" arrangement, whever hovering over a tab should switch which
- * container is on top.
+ * unexposed area. Another example is a bunch of stacked containers in a "tab
+ * folder" arrangement, whever hovering over a tab should switch which container
+ * is on top.
  * <P>
  * Autoexpose helpers are obtained from editparts that are target of whatever
  * operation is being performed. If the target provides no helper, its parent
@@ -49,31 +49,28 @@ public interface AutoexposeHelper {
 	 * <code>true</code>, or it may wait for {@link #step(Point)} to be called
 	 * later.
 	 * 
-	 * @param where
-	 *            the mouse's current location in the viewer
+	 * @param where the mouse's current location in the viewer
 	 * @return <code>true</code> if the location is interesting
 	 */
 	boolean detect(Point where);
 
 	/**
-	 * Performs the autoexpose and returns a hint indicating that the helper
-	 * would like to remain active. The client will continue to call step() for
-	 * as long as it previously returned <code>true</code>, and the conditions
-	 * are deemed appropriate to continue the autoexpose process.
+	 * Performs the autoexpose and returns a hint indicating that the helper would
+	 * like to remain active. The client will continue to call step() for as long as
+	 * it previously returned <code>true</code>, and the conditions are deemed
+	 * appropriate to continue the autoexpose process.
 	 * <P>
 	 * The client may stop calling this method at any time, even if the previous
 	 * invocation returned <code>true</code>. The return value is a hint.
 	 * 
-	 * @param where
-	 *            the current location of the mouse in the viewer
-	 * @return a hint indicating whether this helper should continue to be
-	 *         invoked
+	 * @param where the current location of the mouse in the viewer
+	 * @return a hint indicating whether this helper should continue to be invoked
 	 */
 	boolean step(Point where);
 
 	/**
-	 * Used with EditPartViewers to find the AutoexposeHelper at a Point.
-	 * Clients can instantiate the search, call
+	 * Used with EditPartViewers to find the AutoexposeHelper at a Point. Clients
+	 * can instantiate the search, call
 	 * {@link EditPartViewer#findObjectAtExcluding(Point,Collection, EditPartViewer.Conditional)}
 	 * , and then check the {@link #result} field.
 	 */
@@ -81,8 +78,7 @@ public interface AutoexposeHelper {
 		/**
 		 * Constructs a new Search at a point on the viewer.
 		 * 
-		 * @param pt
-		 *            the mouse location
+		 * @param pt the mouse location
 		 */
 		public Search(Point pt) {
 			where = pt;
@@ -95,8 +91,7 @@ public interface AutoexposeHelper {
 		public AutoexposeHelper result;
 
 		public boolean evaluate(EditPart editpart) {
-			result = editpart
-					.getAdapter(AutoexposeHelper.class);
+			result = editpart.getAdapter(AutoexposeHelper.class);
 			if (result != null && result.detect(where))
 				return true;
 			result = null;

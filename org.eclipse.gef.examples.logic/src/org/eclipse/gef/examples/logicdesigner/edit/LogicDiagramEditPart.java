@@ -58,8 +58,7 @@ import org.eclipse.gef.examples.logicdesigner.model.LogicDiagram;
  * LogicEditorPart, to hold the entire model. It is sort of a blank board where
  * all other EditParts get added.
  */
-public class LogicDiagramEditPart extends LogicContainerEditPart implements
-		LayerConstants {
+public class LogicDiagramEditPart extends LogicContainerEditPart implements LayerConstants {
 
 	protected AccessibleEditPart createAccessible() {
 		return new AccessibleGraphicalEditPart() {
@@ -78,10 +77,9 @@ public class LogicDiagramEditPart extends LogicContainerEditPart implements
 		installEditPolicy(EditPolicy.NODE_ROLE, null);
 		installEditPolicy(EditPolicy.GRAPHICAL_NODE_ROLE, null);
 		installEditPolicy(EditPolicy.SELECTION_FEEDBACK_ROLE, null);
-		installEditPolicy(EditPolicy.COMPONENT_ROLE,
-				new RootComponentEditPolicy());
-		installEditPolicy(EditPolicy.LAYOUT_ROLE, new LogicXYLayoutEditPolicy(
-				(XYLayout) getContentPane().getLayoutManager()));
+		installEditPolicy(EditPolicy.COMPONENT_ROLE, new RootComponentEditPolicy());
+		installEditPolicy(EditPolicy.LAYOUT_ROLE,
+				new LogicXYLayoutEditPolicy((XYLayout) getContentPane().getLayoutManager()));
 
 		installEditPolicy("Snap Feedback", new SnapFeedbackPolicy()); //$NON-NLS-1$
 	}
@@ -102,38 +100,35 @@ public class LogicDiagramEditPart extends LogicContainerEditPart implements
 	/**
 	 * @see org.eclipse.core.runtime.IAdaptable#getAdapter(java.lang.Class)
 	 */
-	public Object getAdapter(Class adapter) {
+	@Override
+	public <T> T getAdapter(final Class<T> adapter) {
 		if (adapter == SnapToHelper.class) {
 			List snapStrategies = new ArrayList();
-			Boolean val = (Boolean) getViewer().getProperty(
-					RulerProvider.PROPERTY_RULER_VISIBILITY);
+			Boolean val = (Boolean) getViewer().getProperty(RulerProvider.PROPERTY_RULER_VISIBILITY);
 			if (val != null && val.booleanValue())
 				snapStrategies.add(new SnapToGuides(this));
-			val = (Boolean) getViewer().getProperty(
-					SnapToGeometry.PROPERTY_SNAP_ENABLED);
+			val = (Boolean) getViewer().getProperty(SnapToGeometry.PROPERTY_SNAP_ENABLED);
 			if (val != null && val.booleanValue())
 				snapStrategies.add(new SnapToGeometry(this));
-			val = (Boolean) getViewer().getProperty(
-					SnapToGrid.PROPERTY_GRID_ENABLED);
+			val = (Boolean) getViewer().getProperty(SnapToGrid.PROPERTY_GRID_ENABLED);
 			if (val != null && val.booleanValue())
 				snapStrategies.add(new SnapToGrid(this));
 
 			if (snapStrategies.size() == 0)
 				return null;
 			if (snapStrategies.size() == 1)
-				return snapStrategies.get(0);
+				return adapter.cast(snapStrategies.get(0));
 
 			SnapToHelper ss[] = new SnapToHelper[snapStrategies.size()];
 			for (int i = 0; i < snapStrategies.size(); i++)
 				ss[i] = (SnapToHelper) snapStrategies.get(i);
-			return new CompoundSnapToHelper(ss);
+			return adapter.cast(new CompoundSnapToHelper(ss));
 		}
 		return super.getAdapter(adapter);
 	}
 
 	public DragTracker getDragTracker(Request req) {
-		if (req instanceof SelectionRequest
-				&& ((SelectionRequest) req).getLastButtonPressed() == 3)
+		if (req instanceof SelectionRequest && ((SelectionRequest) req).getLastButtonPressed() == 3)
 			return new DeselectAllTracker(this);
 		return new MarqueeDragTracker();
 	}
@@ -143,8 +138,7 @@ public class LogicDiagramEditPart extends LogicContainerEditPart implements
 	 * 
 	 * @return ConnectionAnchor
 	 */
-	public ConnectionAnchor getSourceConnectionAnchor(
-			ConnectionEditPart editPart) {
+	public ConnectionAnchor getSourceConnectionAnchor(ConnectionEditPart editPart) {
 		return null;
 	}
 
@@ -162,8 +156,7 @@ public class LogicDiagramEditPart extends LogicContainerEditPart implements
 	 * 
 	 * @return ConnectionAnchor
 	 */
-	public ConnectionAnchor getTargetConnectionAnchor(
-			ConnectionEditPart editPart) {
+	public ConnectionAnchor getTargetConnectionAnchor(ConnectionEditPart editPart) {
 		return null;
 	}
 
@@ -189,17 +182,14 @@ public class LogicDiagramEditPart extends LogicContainerEditPart implements
 		if ((getViewer().getControl().getStyle() & SWT.MIRRORED) == 0)
 			cLayer.setAntialias(SWT.ON);
 
-		if (getLogicDiagram().getConnectionRouter().equals(
-				LogicDiagram.ROUTER_MANUAL)) {
+		if (getLogicDiagram().getConnectionRouter().equals(LogicDiagram.ROUTER_MANUAL)) {
 			AutomaticRouter router = new FanRouter();
 			router.setNextRouter(new BendpointConnectionRouter());
 			cLayer.setConnectionRouter(router);
-		} else if (getLogicDiagram().getConnectionRouter().equals(
-				LogicDiagram.ROUTER_MANHATTAN))
+		} else if (getLogicDiagram().getConnectionRouter().equals(LogicDiagram.ROUTER_MANHATTAN))
 			cLayer.setConnectionRouter(new ManhattanConnectionRouter());
 		else
-			cLayer.setConnectionRouter(new ShortestPathConnectionRouter(
-					getFigure()));
+			cLayer.setConnectionRouter(new ShortestPathConnectionRouter(getFigure()));
 		Animation.run(400);
 	}
 

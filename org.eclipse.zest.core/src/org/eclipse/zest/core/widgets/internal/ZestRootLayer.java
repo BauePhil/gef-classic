@@ -34,9 +34,8 @@ public class ZestRootLayer extends FreeformLayer {
 
 	/**
 	 * Adds a node to the ZestRootLayer
-	 * 
-	 * @param nodeFigure
-	 *            The figure representing the node
+	 *
+	 * @param nodeFigure The figure representing the node
 	 */
 	public void addNode(IFigure nodeFigure) {
 		int nodePosition = getNodePosition();
@@ -46,7 +45,7 @@ public class ZestRootLayer extends FreeformLayer {
 
 	/**
 	 * Removes a node from the layer
-	 * 
+	 *
 	 * @param nodeFigure
 	 */
 	public void removeNode(IFigure nodeFigure) {
@@ -108,8 +107,8 @@ public class ZestRootLayer extends FreeformLayer {
 	public void unHighlightNode(IFigure nodeFigure) {
 		int nodePosition = this.getChildren().indexOf(nodeFigure);
 		if (nodePosition < 0 || nodePosition > getHighlightNodePosition()) {
-			// throw new RuntimeException("Node: " + nodeFigure + " not
-			// currently Highlighted");
+			// throw new RuntimeException("Node: " + nodeFigure + " not currently
+			// Highlighted");
 			return;
 		}
 		this.numberOfHighlightedNodes--;
@@ -125,10 +124,9 @@ public class ZestRootLayer extends FreeformLayer {
 
 	public void unHighlightConnection(IFigure connectionFigure) {
 		int connectionPosition = this.getChildren().indexOf(connectionFigure);
-		if (connectionPosition < 0
-				|| connectionPosition > getHighlightConnectionPosition()) {
-			// throw new RuntimeException("Connection: " + connectionFigure + "
-			// not currently Highlighted");
+		if (connectionPosition < 0 || connectionPosition > getHighlightConnectionPosition()) {
+			// throw new RuntimeException("Connection: " + connectionFigure + " not
+			// currently Highlighted");
 			return;
 		}
 		this.numberOfHighlightedConnections--;

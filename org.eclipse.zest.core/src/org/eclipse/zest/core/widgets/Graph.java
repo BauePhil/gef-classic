@@ -83,14 +83,14 @@ public class Graph extends FigureCanvas implements IContainer {
 	public Color DEFAULT_NODE_COLOR = LIGHT_BLUE;
 
 	/**
-	 * These are all the children of this graph. These lists contains all nodes
-	 * and connections that have added themselves to this graph.
+	 * These are all the children of this graph. These lists contains all nodes and
+	 * connections that have added themselves to this graph.
 	 */
 	private final List nodes;
 	protected List connections;
 	private List selectedItems = null;
 	IFigure fisheyedFigure = null;
-	private List /* SelectionListener */selectionListeners = null;
+	private List /* SelectionListener */ selectionListeners = null;
 
 	/** This maps all visible nodes to their model element. */
 	private HashMap figure2ItemMap = null;
@@ -112,8 +112,8 @@ public class Graph extends FigureCanvas implements IContainer {
 	private boolean hasPendingLayoutRequest;
 
 	/**
-	 * Constructor for a Graph. This widget represents the root of the graph,
-	 * and can contain graph items such as graph nodes and graph connections.
+	 * Constructor for a Graph. This widget represents the root of the graph, and
+	 * can contain graph items such as graph nodes and graph connections.
 	 * 
 	 * @param parent
 	 * @param style
@@ -133,37 +133,31 @@ public class Graph extends FigureCanvas implements IContainer {
 
 		// @tag CGraph.workaround : this allows me to handle mouse events
 		// outside of the canvas
-		this.getLightweightSystem().setEventDispatcher(
-				new SWTEventDispatcher() {
-					public void dispatchMouseMoved(
-							org.eclipse.swt.events.MouseEvent me) {
-						super.dispatchMouseMoved(me);
+		this.getLightweightSystem().setEventDispatcher(new SWTEventDispatcher() {
+			public void dispatchMouseMoved(org.eclipse.swt.events.MouseEvent me) {
+				super.dispatchMouseMoved(me);
 
-						// If the current event is null, return
-						if (getCurrentEvent() == null) {
-							return;
-						}
+				// If the current event is null, return
+				if (getCurrentEvent() == null) {
+					return;
+				}
 
-						if (getMouseTarget() == null) {
-							setMouseTarget(getRoot());
-						}
-						if ((me.stateMask & SWT.BUTTON_MASK) != 0) {
-							// Sometimes getCurrentEvent() returns null
-							getMouseTarget().handleMouseDragged(
-									getCurrentEvent());
-						} else {
-							getMouseTarget()
-									.handleMouseMoved(getCurrentEvent());
-						}
-					}
-				});
+				if (getMouseTarget() == null) {
+					setMouseTarget(getRoot());
+				}
+				if ((me.stateMask & SWT.BUTTON_MASK) != 0) {
+					// Sometimes getCurrentEvent() returns null
+					getMouseTarget().handleMouseDragged(getCurrentEvent());
+				} else {
+					getMouseTarget().handleMouseMoved(getCurrentEvent());
+				}
+			}
+		});
 
 		this.setContents(createLayers());
 		DragSupport dragSupport = new DragSupport(this);
-		this.getLightweightSystem().getRootFigure()
-				.addMouseListener(dragSupport);
-		this.getLightweightSystem().getRootFigure()
-				.addMouseMotionListener(dragSupport);
+		this.getLightweightSystem().getRootFigure().addMouseListener(dragSupport);
+		this.getLightweightSystem().getRootFigure().addMouseMotionListener(dragSupport);
 
 		this.nodes = new ArrayList();
 		this.preferredSize = new Dimension(-1, -1);
@@ -185,16 +179,14 @@ public class Graph extends FigureCanvas implements IContainer {
 					// called once!
 					Iterator iterator = revealListeners.iterator();
 					while (iterator.hasNext()) {
-						RevealListener reveallisetner = (RevealListener) iterator
-								.next();
+						RevealListener reveallisetner = (RevealListener) iterator.next();
 						reveallisetner.revealed(Graph.this);
 						iterator.remove();
 					}
 				}
 				/*
-				 * Iterator iterator = getNodes().iterator(); while
-				 * (iterator.hasNext()) { GraphNode node = (GraphNode)
-				 * iterator.next(); node.paint(); }
+				 * Iterator iterator = getNodes().iterator(); while (iterator.hasNext()) {
+				 * GraphNode node = (GraphNode) iterator.next(); node.paint(); }
 				 */
 			}
 		});
@@ -248,8 +240,7 @@ public class Graph extends FigureCanvas implements IContainer {
 	 * 
 	 * @param constraintAdapters
 	 */
-	public void setConstraintAdapters(
-			List /* ConstraintAdapters */constraintAdapters) {
+	public void setConstraintAdapters(List /* ConstraintAdapters */ constraintAdapters) {
 		this.constraintAdapters = constraintAdapters;
 	}
 
@@ -265,8 +256,7 @@ public class Graph extends FigureCanvas implements IContainer {
 	/**
 	 * Sets the default connection style.
 	 * 
-	 * @param connection
-	 *            style the connection style to set
+	 * @param connection style the connection style to set
 	 * @see org.eclipse.mylar.zest.core.widgets.ZestStyles
 	 */
 	public void setConnectionStyle(int connectionStyle) {
@@ -286,8 +276,7 @@ public class Graph extends FigureCanvas implements IContainer {
 	/**
 	 * Sets the default node style.
 	 * 
-	 * @param nodeStyle
-	 *            the node style to set
+	 * @param nodeStyle the node style to set
 	 * @see org.eclipse.mylar.zest.core.widgets.ZestStyles
 	 */
 	public void setNodeStyle(int nodeStyle) {
@@ -348,15 +337,13 @@ public class Graph extends FigureCanvas implements IContainer {
 	 * @see org.eclipse.swt.widgets.Widget#toString()
 	 */
 	public String toString() {
-		return "GraphModel {" + nodes.size() + " nodes, " + connections.size()
-				+ " connections}";
+		return "GraphModel {" + nodes.size() + " nodes, " + connections.size() + " connections}";
 	}
 
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see
-	 * org.eclipse.mylar.zest.core.internal.graphmodel.IGraphItem#getGraphModel
+	 * @see org.eclipse.mylar.zest.core.internal.graphmodel.IGraphItem#getGraphModel
 	 * ()
 	 */
 	public Graph getGraphModel() {
@@ -372,9 +359,9 @@ public class Graph extends FigureCanvas implements IContainer {
 	}
 
 	/**
-	 * Runs the layout on this graph. It uses the reveal listener to run the
-	 * layout only if the view is visible. Otherwise it will be deferred until
-	 * after the view is available.
+	 * Runs the layout on this graph. It uses the reveal listener to run the layout
+	 * only if the view is visible. Otherwise it will be deferred until after the
+	 * view is available.
 	 */
 	public void applyLayout() {
 		if (!hasPendingLayoutRequest) {
@@ -406,8 +393,7 @@ public class Graph extends FigureCanvas implements IContainer {
 	/**
 	 * @param algorithm
 	 */
-	public void setLayoutAlgorithm(LayoutAlgorithm algorithm,
-			boolean applyLayout) {
+	public void setLayoutAlgorithm(LayoutAlgorithm algorithm, boolean applyLayout) {
 		this.layoutAlgorithm = algorithm;
 		if (applyLayout) {
 			applyLayout();
@@ -424,51 +410,43 @@ public class Graph extends FigureCanvas implements IContainer {
 	 * This point should be translated to relative before calling findFigureAt
 	 */
 	public IFigure getFigureAt(int x, int y) {
-		IFigure figureUnderMouse = this.getContents().findFigureAt(x, y,
-				new TreeSearch() {
+		IFigure figureUnderMouse = this.getContents().findFigureAt(x, y, new TreeSearch() {
 
-					public boolean accept(IFigure figure) {
-						return true;
-					}
+			public boolean accept(IFigure figure) {
+				return true;
+			}
 
-					public boolean prune(IFigure figure) {
-						IFigure parent = figure.getParent();
-						// @tag TODO Zest : change these to from getParent to
-						// their actual layer names
+			public boolean prune(IFigure figure) {
+				IFigure parent = figure.getParent();
+				// @tag TODO Zest : change these to from getParent to
+				// their actual layer names
 
-						if (parent == fishEyeLayer) {
-							// If it node is on the fish eye layer, don't worry
-							// about it.
-							return true;
-						}
-						if (parent instanceof ContainerFigure
-								&& figure instanceof PolylineConnection) {
-							return false;
-						}
-						if (parent == zestRootLayer
-								|| parent == zestRootLayer.getParent()
-								|| parent == zestRootLayer.getParent()
-										.getParent()) {
-							return false;
-						}
-						GraphItem item = (GraphItem) figure2ItemMap.get(figure);
-						if (item != null
-								&& item.getItemType() == GraphItem.CONTAINER) {
-							return false;
-						} else if (figure instanceof FreeformLayer
-								|| parent instanceof FreeformLayer
-								|| figure instanceof ScrollPane
-								|| parent instanceof ScrollPane
-								|| parent instanceof ScalableFreeformLayeredPane
-								|| figure instanceof ScalableFreeformLayeredPane
-								|| figure instanceof FreeformViewport
-								|| parent instanceof FreeformViewport) {
-							return false;
-						}
-						return true;
-					}
+				if (parent == fishEyeLayer) {
+					// If it node is on the fish eye layer, don't worry
+					// about it.
+					return true;
+				}
+				if (parent instanceof ContainerFigure && figure instanceof PolylineConnection) {
+					return false;
+				}
+				if (parent == zestRootLayer || parent == zestRootLayer.getParent()
+						|| parent == zestRootLayer.getParent().getParent()) {
+					return false;
+				}
+				GraphItem item = (GraphItem) figure2ItemMap.get(figure);
+				if (item != null && item.getItemType() == GraphItem.CONTAINER) {
+					return false;
+				} else if (figure instanceof FreeformLayer || parent instanceof FreeformLayer
+						|| figure instanceof ScrollPane || parent instanceof ScrollPane
+						|| parent instanceof ScalableFreeformLayeredPane
+						|| figure instanceof ScalableFreeformLayeredPane || figure instanceof FreeformViewport
+						|| parent instanceof FreeformViewport) {
+					return false;
+				}
+				return true;
+			}
 
-				});
+		});
 		return figureUnderMouse;
 
 	}
@@ -476,8 +454,7 @@ public class Graph extends FigureCanvas implements IContainer {
 	// /////////////////////////////////////////////////////////////////////////////////
 	// PRIVATE METHODS. These are NON API
 	// /////////////////////////////////////////////////////////////////////////////////
-	class DragSupport implements MouseMotionListener,
-			org.eclipse.draw2d.MouseListener {
+	class DragSupport implements MouseMotionListener, org.eclipse.draw2d.MouseListener {
 		/**
 		 * 
 		 */
@@ -500,37 +477,28 @@ public class Graph extends FigureCanvas implements IContainer {
 				Iterator iterator = selectedItems.iterator();
 				while (iterator.hasNext()) {
 					GraphItem item = (GraphItem) iterator.next();
-					if ((item.getItemType() == GraphItem.NODE)
-							|| (item.getItemType() == GraphItem.CONTAINER)) {
+					if ((item.getItemType() == GraphItem.NODE) || (item.getItemType() == GraphItem.CONTAINER)) {
 						// @tag Zest.selection Zest.move : This is where the
 						// node movement is tracked
 						Point pointCopy = mousePoint.getCopy();
 
 						Point tempLastLocation = lastLocation.getCopy();
-						item.getFigure().getParent()
-								.translateToRelative(tempLastLocation);
-						item.getFigure().getParent()
-								.translateFromParent(tempLastLocation);
+						item.getFigure().getParent().translateToRelative(tempLastLocation);
+						item.getFigure().getParent().translateFromParent(tempLastLocation);
 
-						item.getFigure().getParent()
-								.translateToRelative(pointCopy);
-						item.getFigure().getParent()
-								.translateFromParent(pointCopy);
-						Point delta = new Point(pointCopy.x
-								- tempLastLocation.x, pointCopy.y
-								- tempLastLocation.y);
-						if (item.getItemType() == GraphItem.NODE
-								|| item.getItemType() == GraphItem.CONTAINER) {
+						item.getFigure().getParent().translateToRelative(pointCopy);
+						item.getFigure().getParent().translateFromParent(pointCopy);
+						Point delta = new Point(pointCopy.x - tempLastLocation.x, pointCopy.y - tempLastLocation.y);
+						if (item.getItemType() == GraphItem.NODE || item.getItemType() == GraphItem.CONTAINER) {
 							GraphNode node = (GraphNode) item;
-							node.setLocation(node.getLocation().x + delta.x,
-									node.getLocation().y + delta.y);
+							node.setLocation(node.getLocation().x + delta.x, node.getLocation().y + delta.y);
 
 						}
 						/*
-						 * else if (item.getItemType() == GraphItem.CONTAINER) {
-						 * GraphContainer container = (GraphContainer) item;
-						 * container.setLocation(container.getLocation().x +
-						 * delta.x, container.getLocation().y + delta.y); }
+						 * else if (item.getItemType() == GraphItem.CONTAINER) { GraphContainer
+						 * container = (GraphContainer) item;
+						 * container.setLocation(container.getLocation().x + delta.x,
+						 * container.getLocation().y + delta.y); }
 						 */
 					} else {
 						// There is no movement for connection
@@ -545,12 +513,10 @@ public class Graph extends FigureCanvas implements IContainer {
 
 					fisheyedFigure.translateToRelative(pointCopy);
 					fisheyedFigure.translateFromParent(pointCopy);
-					Point delta = new Point(pointCopy.x - tempLastLocation.x,
-							pointCopy.y - tempLastLocation.y);
-					Point point = new Point(fisheyedFigure.getBounds().x
-							+ delta.x, fisheyedFigure.getBounds().y + delta.y);
-					fishEyeLayer.setConstraint(fisheyedFigure, new Rectangle(
-							point, fisheyedFigure.getSize()));
+					Point delta = new Point(pointCopy.x - tempLastLocation.x, pointCopy.y - tempLastLocation.y);
+					Point point = new Point(fisheyedFigure.getBounds().x + delta.x,
+							fisheyedFigure.getBounds().y + delta.y);
+					fishEyeLayer.setConstraint(fisheyedFigure, new Rectangle(point, fisheyedFigure.getSize()));
 					fishEyeLayer.getUpdateManager().performUpdate();
 					// fisheyedFigure.setBounds(new Rectangle(point2,
 					// fisheyedFigure.getSize()));
@@ -577,8 +543,8 @@ public class Graph extends FigureCanvas implements IContainer {
 
 		/**
 		 * This tracks whenever a mouse moves. The only thing we care about is
-		 * fisheye(ing) nodes. This means whenever the mouse moves we check if
-		 * we need to fisheye on a node or not.
+		 * fisheye(ing) nodes. This means whenever the mouse moves we check if we need
+		 * to fisheye on a node or not.
 		 */
 		public void mouseMoved(org.eclipse.draw2d.MouseEvent me) {
 			Point mousePoint = new Point(me.x, me.y);
@@ -587,15 +553,12 @@ public class Graph extends FigureCanvas implements IContainer {
 
 			if (figureUnderMouse != null) {
 				// There is a figure under this mouse
-				GraphItem itemUnderMouse = (GraphItem) figure2ItemMap
-						.get(figureUnderMouse);
+				GraphItem itemUnderMouse = (GraphItem) figure2ItemMap.get(figureUnderMouse);
 				if (itemUnderMouse == fisheyedItem) {
 
-				} else if (itemUnderMouse != null
-						&& itemUnderMouse.getItemType() == GraphItem.NODE) {
+				} else if (itemUnderMouse != null && itemUnderMouse.getItemType() == GraphItem.NODE) {
 					fisheyedItem = itemUnderMouse;
-					fisheyedFigure = ((GraphNode) itemUnderMouse).fishEye(true,
-							true);
+					fisheyedFigure = ((GraphNode) itemUnderMouse).fishEye(true, true);
 					if (fisheyedFigure == null) {
 						// If there is no fisheye figure (this means that the
 						// node does not support a fish eye)
@@ -633,10 +596,8 @@ public class Graph extends FigureCanvas implements IContainer {
 					scale *= 1.05;
 					getRootLayer().setScale(scale);
 					Point newMousePoint = mousePoint.getCopy().scale(1.05);
-					Point delta = new Point(newMousePoint.x - mousePoint.x,
-							newMousePoint.y - mousePoint.y);
-					Point newViewLocation = getViewport().getViewLocation()
-							.getCopy().translate(delta);
+					Point delta = new Point(newMousePoint.x - mousePoint.x, newMousePoint.y - mousePoint.y);
+					Point newViewLocation = getViewport().getViewLocation().getCopy().translate(delta);
 					getViewport().setViewLocation(newViewLocation);
 
 					clearSelection();
@@ -647,23 +608,19 @@ public class Graph extends FigureCanvas implements IContainer {
 					getRootLayer().setScale(scale);
 
 					Point newMousePoint = mousePoint.getCopy().scale(1 / 1.05);
-					Point delta = new Point(newMousePoint.x - mousePoint.x,
-							newMousePoint.y - mousePoint.y);
-					Point newViewLocation = getViewport().getViewLocation()
-							.getCopy().translate(delta);
+					Point delta = new Point(newMousePoint.x - mousePoint.x, newMousePoint.y - mousePoint.y);
+					Point newViewLocation = getViewport().getViewLocation().getCopy().translate(delta);
 					getViewport().setViewLocation(newViewLocation);
 					clearSelection();
 					return;
 				}
 			} else {
 				boolean hasSelection = selectedItems.size() > 0;
-				IFigure figureUnderMouse = getFigureAt(mousePoint.x,
-						mousePoint.y);
+				IFigure figureUnderMouse = getFigureAt(mousePoint.x, mousePoint.y);
 				getRootLayer().translateFromParent(mousePoint);
 
 				if (figureUnderMouse != null) {
-					figureUnderMouse.getParent()
-							.translateFromParent(mousePoint);
+					figureUnderMouse.getParent().translateFromParent(mousePoint);
 				}
 				// If the figure under the mouse is the canvas, and CTRL/CMD is
 				// not being held down, then select nothing
@@ -678,8 +635,7 @@ public class Graph extends FigureCanvas implements IContainer {
 					return;
 				}
 
-				GraphItem itemUnderMouse = (GraphItem) figure2ItemMap
-						.get(figureUnderMouse);
+				GraphItem itemUnderMouse = (GraphItem) figure2ItemMap.get(figureUnderMouse);
 				if (itemUnderMouse == null) {
 					if ((me.getState() & SWT.MOD1) != 0) {
 						clearSelection();
@@ -818,8 +774,7 @@ public class Graph extends FigureCanvas implements IContainer {
 	}
 
 	/**
-	 * Moves the edge to the highlight layer. This moves the edge above the
-	 * nodes
+	 * Moves the edge to the highlight layer. This moves the edge above the nodes
 	 * 
 	 * @param connection
 	 */
@@ -891,8 +846,8 @@ public class Graph extends FigureCanvas implements IContainer {
 	}
 
 	/**
-	 * Converts the list of GraphModelConnection objects into an array and
-	 * returns it.
+	 * Converts the list of GraphModelConnection objects into an array and returns
+	 * it.
 	 * 
 	 * @return GraphModelConnection[]
 	 */
@@ -910,25 +865,21 @@ public class Graph extends FigureCanvas implements IContainer {
 			LinkedList connectionList = new LinkedList();
 			for (Iterator i = this.getConnections().iterator(); i.hasNext();) {
 				GraphConnection next = (GraphConnection) i.next();
-				if (next.isVisible()
-						&& nodesToLayout.contains(next.getSource())
+				if (next.isVisible() && nodesToLayout.contains(next.getSource())
 						&& nodesToLayout.contains(next.getDestination())) {
 					connectionList.add(next.getLayoutRelationship());
 				}
 			}
-			entities = (LayoutRelationship[]) connectionList
-					.toArray(new LayoutRelationship[] {});
+			entities = (LayoutRelationship[]) connectionList.toArray(new LayoutRelationship[] {});
 		} else {
 			LinkedList nodeList = new LinkedList();
 			for (Iterator i = this.getConnections().iterator(); i.hasNext();) {
 				GraphConnection next = (GraphConnection) i.next();
-				if (nodesToLayout.contains(next.getSource())
-						&& nodesToLayout.contains(next.getDestination())) {
+				if (nodesToLayout.contains(next.getSource()) && nodesToLayout.contains(next.getDestination())) {
 					nodeList.add(next.getLayoutRelationship());
 				}
 			}
-			entities = (LayoutRelationship[]) nodeList
-					.toArray(new LayoutRelationship[] {});
+			entities = (LayoutRelationship[]) nodeList.toArray(new LayoutRelationship[] {});
 		}
 		return entities;
 	}
@@ -959,10 +910,8 @@ public class Graph extends FigureCanvas implements IContainer {
 
 	void removeConnection(GraphConnection connection) {
 		IFigure figure = connection.getConnectionFigure();
-		PolylineConnection sourceContainerConnectionFigure = connection
-				.getSourceContainerConnectionFigure();
-		PolylineConnection targetContainerConnectionFigure = connection
-				.getTargetContainerConnectionFigure();
+		PolylineConnection sourceContainerConnectionFigure = connection.getSourceContainerConnectionFigure();
+		PolylineConnection targetContainerConnectionFigure = connection.getTargetContainerConnectionFigure();
 		connection.removeFigure();
 		this.getConnections().remove(connection);
 		figure2ItemMap.remove(figure);
@@ -1003,12 +952,12 @@ public class Graph extends FigureCanvas implements IContainer {
 	 * Iterator iterator = this.getConnections().iterator(); while
 	 * (iterator.hasNext()) { GraphConnection connection = (GraphConnection)
 	 * iterator.next(); IFigure figure = connection.getFigure(); if
-	 * (!zestRootLayer.getChildren().contains(figure)) { if (true || false ||
-	 * false) { zestRootLayer.addConnection(connection.getFigure()); } } }
-	 * iterator = this.getNodes().iterator(); while (iterator.hasNext()) {
-	 * GraphNode graphNode = (GraphNode) iterator.next(); IFigure figure =
-	 * graphNode.getFigure(); if (!zestRootLayer.getChildren().contains(figure))
-	 * { zestRootLayer.addNode(graphNode.getFigure()); } }
+	 * (!zestRootLayer.getChildren().contains(figure)) { if (true || false || false)
+	 * { zestRootLayer.addConnection(connection.getFigure()); } } } iterator =
+	 * this.getNodes().iterator(); while (iterator.hasNext()) { GraphNode graphNode
+	 * = (GraphNode) iterator.next(); IFigure figure = graphNode.getFigure(); if
+	 * (!zestRootLayer.getChildren().contains(figure)) {
+	 * zestRootLayer.addNode(graphNode.getFigure()); } }
 	 * 
 	 * super.redraw();
 	 * 
@@ -1034,19 +983,16 @@ public class Graph extends FigureCanvas implements IContainer {
 			IFigure figure = item.getFigure();
 			figure2ItemMap.put(figure, item);
 			if (((GraphConnection) item).getSourceContainerConnectionFigure() != null) {
-				figure2ItemMap.put(((GraphConnection) item)
-						.getSourceContainerConnectionFigure(), item);
+				figure2ItemMap.put(((GraphConnection) item).getSourceContainerConnectionFigure(), item);
 			}
 			if (((GraphConnection) item).getTargetContainerConnectionFigure() != null) {
-				figure2ItemMap.put(((GraphConnection) item)
-						.getTargetContainerConnectionFigure(), item);
+				figure2ItemMap.put(((GraphConnection) item).getTargetContainerConnectionFigure(), item);
 			}
 		} else if (item.getItemType() == GraphItem.CONTAINER) {
 			IFigure figure = item.getFigure();
 			figure2ItemMap.put(figure, item);
 		} else {
-			throw new RuntimeException("Unknown item type: "
-					+ item.getItemType());
+			throw new RuntimeException("Unknown item type: " + item.getItemType());
 		}
 	}
 
@@ -1055,8 +1001,7 @@ public class Graph extends FigureCanvas implements IContainer {
 	 * 
 	 * /** Changes the figure for a particular node
 	 */
-	void changeNodeFigure(IFigure oldValue, IFigure newFigure,
-			GraphNode graphItem) {
+	void changeNodeFigure(IFigure oldValue, IFigure newFigure, GraphNode graphItem) {
 		if (zestRootLayer.getChildren().contains(oldValue)) {
 			zestRootLayer.remove(oldValue);
 			figure2ItemMap.remove(oldValue);
@@ -1077,8 +1022,7 @@ public class Graph extends FigureCanvas implements IContainer {
 		}
 		Iterator iterator = this.constraintAdapters.iterator();
 		while (iterator.hasNext()) {
-			ConstraintAdapter constraintAdapter = (ConstraintAdapter) iterator
-					.next();
+			ConstraintAdapter constraintAdapter = (ConstraintAdapter) iterator.next();
 			constraintAdapter.populateConstraint(object, constraint);
 		}
 	}
@@ -1124,8 +1068,7 @@ public class Graph extends FigureCanvas implements IContainer {
 			if ((nodeStyle & ZestStyles.NODES_NO_LAYOUT_ANIMATION) == 0) {
 				Animation.markBegin();
 			}
-			layoutAlgorithm.applyLayout(nodesToLayout, connectionsToLayout, 0,
-					0, d.width, d.height, false, false);
+			layoutAlgorithm.applyLayout(nodesToLayout, connectionsToLayout, 0, 0, d.width, d.height, false, false);
 			if ((nodeStyle & ZestStyles.NODES_NO_LAYOUT_ANIMATION) == 0) {
 				Animation.run(ANIMATION_TIME);
 			}
@@ -1142,10 +1085,9 @@ public class Graph extends FigureCanvas implements IContainer {
 	}
 
 	/**
-	 * Adds a reveal listener to the view. Note: A reveal listener will only
-	 * every be called ONCE!!! even if a view comes and goes. There is no remove
-	 * reveal listener. This is used to defer some events until after the view
-	 * is revealed.
+	 * Adds a reveal listener to the view. Note: A reveal listener will only every
+	 * be called ONCE!!! even if a view comes and goes. There is no remove reveal
+	 * listener. This is used to defer some events until after the view is revealed.
 	 * 
 	 * @param revealListener
 	 */
@@ -1192,16 +1134,13 @@ public class Graph extends FigureCanvas implements IContainer {
 
 	/**
 	 * This removes the fisheye from the graph. It uses an animation to make the
-	 * fisheye shrink, and then it finally clears the fisheye layer. This
-	 * assumes that there is ever only 1 node on the fisheye layer at any time.
+	 * fisheye shrink, and then it finally clears the fisheye layer. This assumes
+	 * that there is ever only 1 node on the fisheye layer at any time.
 	 * 
-	 * @param fishEyeFigure
-	 *            The fisheye figure
-	 * @param regularFigure
-	 *            The regular figure (i.e. the non fisheye version)
+	 * @param fishEyeFigure The fisheye figure
+	 * @param regularFigure The regular figure (i.e. the non fisheye version)
 	 */
-	void removeFishEye(final IFigure fishEyeFigure,
-			final IFigure regularFigure, boolean animate) {
+	void removeFishEye(final IFigure fishEyeFigure, final IFigure regularFigure, boolean animate) {
 
 		if (!fishEyeLayer.getChildren().contains(fishEyeFigure)) {
 			return;
@@ -1252,19 +1191,15 @@ public class Graph extends FigureCanvas implements IContainer {
 	}
 
 	/**
-	 * Add a fisheye version of the node. This works by animating the change
-	 * from the original node to the fisheyed one, and then placing the fisheye
-	 * node on the fisheye layer.
+	 * Add a fisheye version of the node. This works by animating the change from
+	 * the original node to the fisheyed one, and then placing the fisheye node on
+	 * the fisheye layer.
 	 * 
-	 * @param startFigure
-	 *            The original node
-	 * @param endFigure
-	 *            The fisheye figure
-	 * @param newBounds
-	 *            The final size of the fisheyed figure
+	 * @param startFigure The original node
+	 * @param endFigure   The fisheye figure
+	 * @param newBounds   The final size of the fisheyed figure
 	 */
-	void fishEye(IFigure startFigure, IFigure endFigure, Rectangle newBounds,
-			boolean animate) {
+	void fishEye(IFigure startFigure, IFigure endFigure, Rectangle newBounds, boolean animate) {
 
 		fishEyeLayer.removeAll();
 		fisheyedFigure = null;

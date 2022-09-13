@@ -4,7 +4,7 @@
  * available under the terms of the Eclipse Public License v1.0 which
  * accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors: The Chisel Group, University of Victoria
  ******************************************************************************/
 package org.eclipse.zest.core.widgets;
@@ -37,9 +37,9 @@ import org.eclipse.zest.layouts.constraints.LayoutConstraint;
 /**
  * This is the graph connection model which stores the source and destination
  * nodes and the properties of this connection (color, line width etc).
- * 
+ *
  * @author Chris Callendar
- * 
+ *
  * @author Ian Bull
  */
 public class GraphConnection extends GraphItem {
@@ -77,8 +77,7 @@ public class GraphConnection extends GraphItem {
 	private GraphLayoutConnection layoutConnection = null;
 	private boolean hasCustomTooltip;
 
-	public GraphConnection(Graph graphModel, int style, GraphNode source,
-			GraphNode destination) {
+	public GraphConnection(Graph graphModel, int style, GraphNode source, GraphNode destination) {
 		super(graphModel, style);
 
 		this.connectionStyle |= graphModel.getConnectionStyle();
@@ -149,21 +148,18 @@ public class GraphConnection extends GraphItem {
 	void removeFigure() {
 		if (connectionFigure.getParent() != null) {
 			if (connectionFigure.getParent() instanceof ZestRootLayer) {
-				((ZestRootLayer) connectionFigure.getParent())
-						.removeConnection(connectionFigure);
+				((ZestRootLayer) connectionFigure.getParent()).removeConnection(connectionFigure);
 			} else {
 				connectionFigure.getParent().remove(connectionFigure);
 			}
 		}
 		connectionFigure = null;
 		if (sourceContainerConnectionFigure != null) {
-			sourceContainerConnectionFigure.getParent().remove(
-					sourceContainerConnectionFigure);
+			sourceContainerConnectionFigure.getParent().remove(sourceContainerConnectionFigure);
 			sourceContainerConnectionFigure = null;
 		}
 		if (targetContainerConnectionFigure != null) {
-			targetContainerConnectionFigure.getParent().remove(
-					targetContainerConnectionFigure);
+			targetContainerConnectionFigure.getParent().remove(targetContainerConnectionFigure);
 			targetContainerConnectionFigure = null;
 		}
 
@@ -176,12 +172,10 @@ public class GraphConnection extends GraphItem {
 		(getDestination()).removeTargetConnection(this);
 		graphModel.removeConnection(this);
 		if (sourceContainerConnectionFigure != null) {
-			sourceContainerConnectionFigure.getParent().remove(
-					sourceContainerConnectionFigure);
+			sourceContainerConnectionFigure.getParent().remove(sourceContainerConnectionFigure);
 		}
 		if (targetContainerConnectionFigure != null) {
-			targetContainerConnectionFigure.getParent().remove(
-					targetContainerConnectionFigure);
+			targetContainerConnectionFigure.getParent().remove(targetContainerConnectionFigure);
 		}
 	}
 
@@ -197,9 +191,8 @@ public class GraphConnection extends GraphItem {
 	}
 
 	/**
-	 * Gets a proxy to this connection that can be used with the Zest layout
-	 * engine
-	 * 
+	 * Gets a proxy to this connection that can be used with the Zest layout engine
+	 *
 	 * @return
 	 */
 	public LayoutRelationship getLayoutRelationship() {
@@ -208,7 +201,7 @@ public class GraphConnection extends GraphItem {
 
 	/**
 	 * Gets the external connection object.
-	 * 
+	 *
 	 * @return Object
 	 */
 	public Object getExternalConnection() {
@@ -217,22 +210,21 @@ public class GraphConnection extends GraphItem {
 
 	/**
 	 * Returns a string like 'source -> destination'
-	 * 
+	 *
 	 * @return String
 	 */
 	public String toString() {
 		String arrow = (isBidirectionalInLayout() ? " <--> " : " --> ");
 		String src = (sourceNode != null ? sourceNode.getText() : "null");
-		String dest = (destinationNode != null ? destinationNode.getText()
-				: "null");
+		String dest = (destinationNode != null ? destinationNode.getText() : "null");
 		String weight = "  (weight=" + getWeightInLayout() + ")";
 		return ("GraphModelConnection: " + src + arrow + dest + weight);
 	}
 
 	/**
-	 * Returns the style of this connection. Valid styles are those that begin
-	 * with CONNECTION in ZestStyles.
-	 * 
+	 * Returns the style of this connection. Valid styles are those that begin with
+	 * CONNECTION in ZestStyles.
+	 *
 	 * @return the style of this connection.
 	 * @see #ZestStyles
 	 */
@@ -241,9 +233,9 @@ public class GraphConnection extends GraphItem {
 	}
 
 	/**
-	 * Returns the style of this connection. Valid styles are those that begin
-	 * with CONNECTION in ZestStyles.
-	 * 
+	 * Returns the style of this connection. Valid styles are those that begin with
+	 * CONNECTION in ZestStyles.
+	 *
 	 * @return the style of this connection.
 	 * @see #ZestStyles
 	 */
@@ -254,11 +246,11 @@ public class GraphConnection extends GraphItem {
 
 	/**
 	 * Gets the weight of this connection. The weight must be in {-1, [0-1]}. A
-	 * weight of -1 means that there is no force/tension between the nodes. A
-	 * weight of 0 results in the maximum spring length being used (farthest
-	 * apart). A weight of 1 results in the minimum spring length being used
-	 * (closest together).
-	 * 
+	 * weight of -1 means that there is no force/tension between the nodes. A weight
+	 * of 0 results in the maximum spring length being used (farthest apart). A
+	 * weight of 1 results in the minimum spring length being used (closest
+	 * together).
+	 *
 	 * @see org.eclipse.mylar.zest.layouts.LayoutRelationship#getWeightInLayout()
 	 * @return the weight: {-1, [0 - 1]}.
 	 */
@@ -268,7 +260,7 @@ public class GraphConnection extends GraphItem {
 
 	/**
 	 * Gets the font for the label on this connection
-	 * 
+	 *
 	 * @return
 	 */
 	public Font getFont() {
@@ -277,7 +269,7 @@ public class GraphConnection extends GraphItem {
 
 	/**
 	 * Sets the font for the label on this connection.
-	 * 
+	 *
 	 */
 	public void setFont(Font f) {
 		this.font = f;
@@ -285,11 +277,11 @@ public class GraphConnection extends GraphItem {
 
 	/**
 	 * Sets the weight for this connection. The weight must be in {-1, [0-1]}. A
-	 * weight of -1 means that there is no force/tension between the nodes. A
-	 * weight of 0 results in the maximum spring length being used (farthest
-	 * apart). A weight of 1 results in the minimum spring length being used
-	 * (closest together).
-	 * 
+	 * weight of -1 means that there is no force/tension between the nodes. A weight
+	 * of 0 results in the maximum spring length being used (farthest apart). A
+	 * weight of 1 results in the minimum spring length being used (closest
+	 * together).
+	 *
 	 */
 	public void setWeight(double weight) {
 		if (weight < 0) {
@@ -303,7 +295,7 @@ public class GraphConnection extends GraphItem {
 
 	/**
 	 * Returns the color of this connection.
-	 * 
+	 *
 	 * @return Color
 	 */
 	public Color getLineColor() {
@@ -312,9 +304,8 @@ public class GraphConnection extends GraphItem {
 
 	/**
 	 * Sets the highlight color.
-	 * 
-	 * @param color
-	 *            the color to use for highlighting.
+	 *
+	 * @param color the color to use for highlighting.
 	 */
 	public void setHighlightColor(Color color) {
 		this.highlightColor = color;
@@ -328,12 +319,11 @@ public class GraphConnection extends GraphItem {
 	}
 
 	/**
-	 * Perminently sets the color of this line to the given color. This will
-	 * become the color of the line when it is not highlighted. If you would
-	 * like to temporarily change the color of the line, use changeLineColor.
-	 * 
-	 * @param color
-	 *            the color to be set.
+	 * Perminently sets the color of this line to the given color. This will become
+	 * the color of the line when it is not highlighted. If you would like to
+	 * temporarily change the color of the line, use changeLineColor.
+	 *
+	 * @param color the color to be set.
 	 * @see changeLineColor(Color color)
 	 */
 	public void setLineColor(Color color) {
@@ -343,7 +333,7 @@ public class GraphConnection extends GraphItem {
 
 	/**
 	 * Sets the connection color.
-	 * 
+	 *
 	 * @param color
 	 */
 	public void changeLineColor(Color color) {
@@ -352,9 +342,9 @@ public class GraphConnection extends GraphItem {
 	}
 
 	/**
-	 * Sets the tooltip on this node. This tooltip will display if the mouse
-	 * hovers over the node. Setting the tooltip has no effect if a custom
-	 * figure has been set.
+	 * Sets the tooltip on this node. This tooltip will display if the mouse hovers
+	 * over the node. Setting the tooltip has no effect if a custom figure has been
+	 * set.
 	 */
 	public void setTooltip(IFigure tooltip) {
 		hasCustomTooltip = true;
@@ -363,8 +353,8 @@ public class GraphConnection extends GraphItem {
 	}
 
 	/**
-	 * Gets the current tooltip for this node. The tooltip returned is
-	 * meaningless if a custom figure has been set.
+	 * Gets the current tooltip for this node. The tooltip returned is meaningless
+	 * if a custom figure has been set.
 	 */
 	public IFigure getTooltip() {
 		return this.tooltip;
@@ -372,7 +362,7 @@ public class GraphConnection extends GraphItem {
 
 	/**
 	 * Returns the connection line width.
-	 * 
+	 *
 	 * @return int
 	 */
 	public int getLineWidth() {
@@ -381,7 +371,7 @@ public class GraphConnection extends GraphItem {
 
 	/**
 	 * Sets the connection line width.
-	 * 
+	 *
 	 * @param lineWidth
 	 */
 	public void setLineWidth(int lineWidth) {
@@ -391,7 +381,7 @@ public class GraphConnection extends GraphItem {
 
 	/**
 	 * Returns the connection line style.
-	 * 
+	 *
 	 * @return int
 	 */
 	public int getLineStyle() {
@@ -400,7 +390,7 @@ public class GraphConnection extends GraphItem {
 
 	/**
 	 * Sets the connection line style.
-	 * 
+	 *
 	 * @param lineStyle
 	 */
 	public void setLineStyle(int lineStyle) {
@@ -410,7 +400,7 @@ public class GraphConnection extends GraphItem {
 
 	/**
 	 * Gets the source node for this relationship
-	 * 
+	 *
 	 * @return GraphModelNode
 	 */
 	public GraphNode getSource() {
@@ -419,7 +409,7 @@ public class GraphConnection extends GraphItem {
 
 	/**
 	 * Gets the target node for this relationship
-	 * 
+	 *
 	 * @return GraphModelNode
 	 */
 	public GraphNode getDestination() {
@@ -452,7 +442,7 @@ public class GraphConnection extends GraphItem {
 
 	/**
 	 * Returns true if this connection is highlighted, false otherwise
-	 * 
+	 *
 	 * @return
 	 */
 	public boolean isHighlighted() {
@@ -461,7 +451,7 @@ public class GraphConnection extends GraphItem {
 
 	/**
 	 * Gets the graph model that this connection is in
-	 * 
+	 *
 	 * @return The graph model that this connection is contained in
 	 */
 	public Graph getGraphModel() {
@@ -469,19 +459,17 @@ public class GraphConnection extends GraphItem {
 	}
 
 	/**
-	 * Sets the curve depth of the arc. The curve depth is defined as the
-	 * maximum distance from any point on the chord (i.e. a vector normal to the
-	 * chord with magnitude d).
-	 * 
+	 * Sets the curve depth of the arc. The curve depth is defined as the maximum
+	 * distance from any point on the chord (i.e. a vector normal to the chord with
+	 * magnitude d).
+	 *
 	 * If 0 is set, a Polyline Connection will be used, otherwise a
 	 * PolylineArcConnectoin will be used. Negative depths are also supported.
-	 * 
-	 * @param depth
-	 *            The depth of the curve
+	 *
+	 * @param depth The depth of the curve
 	 */
 	public void setCurveDepth(int depth) {
-		if (this.curveDepth == 0 && depth != 0 || this.curveDepth != 0
-				&& depth == 0) {
+		if (this.curveDepth == 0 && depth != 0 || this.curveDepth != 0 && depth == 0) {
 			// There is currently no curve, so we have to create
 			// a curved connection
 			this.cachedConnectionFigure = connectionFigure;
@@ -498,7 +486,7 @@ public class GraphConnection extends GraphItem {
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see org.eclipse.mylar.zest.core.widgets.IGraphItem#getItemType()
 	 */
 	public int getItemType() {
@@ -507,9 +495,8 @@ public class GraphConnection extends GraphItem {
 
 	/*
 	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * org.eclipse.mylar.zest.core.internal.graphmodel.GraphItem#setVisible(
+	 *
+	 * @see org.eclipse.mylar.zest.core.internal.graphmodel.GraphItem#setVisible(
 	 * boolean)
 	 */
 	public void setVisible(boolean visible) {
@@ -538,7 +525,7 @@ public class GraphConnection extends GraphItem {
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see org.eclipse.mylar.zest.core.widgets.IGraphItem#isVisible()
 	 */
 	public boolean isVisible() {
@@ -547,7 +534,7 @@ public class GraphConnection extends GraphItem {
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see org.eclipse.swt.widgets.Item#setText(java.lang.String)
 	 */
 	public void setText(String string) {
@@ -621,8 +608,7 @@ public class GraphConnection extends GraphItem {
 		}
 
 		IFigure toolTip;
-		if (this.getTooltip() == null && getText() != null
-				&& getText().length() > 0 && hasCustomTooltip == false) {
+		if (this.getTooltip() == null && getText() != null && getText().length() > 0 && hasCustomTooltip == false) {
 			toolTip = new Label();
 			((Label) toolTip).setText(getText());
 		} else {
@@ -638,10 +624,10 @@ public class GraphConnection extends GraphItem {
 		 * sourceContainerConnectionFigure = doCreateFigure();
 		 * container.addConnectionFigure((PolylineConnection)
 		 * sourceContainerConnectionFigure); } if
-		 * ((destinationNode.getParent()).getItemType() == GraphItem.CONTAINER)
-		 * { GraphContainer container = (GraphContainer)
-		 * destinationNode.getParent(); targetContainerConnectionFigure =
-		 * doCreateFigure(); container.addConnectionFigure((PolylineConnection)
+		 * ((destinationNode.getParent()).getItemType() == GraphItem.CONTAINER) {
+		 * GraphContainer container = (GraphContainer) destinationNode.getParent();
+		 * targetContainerConnectionFigure = doCreateFigure();
+		 * container.addConnectionFigure((PolylineConnection)
 		 * targetContainerConnectionFigure); }
 		 */
 
@@ -666,8 +652,7 @@ public class GraphConnection extends GraphItem {
 				protected Point getReferencePoint() {
 					Point p = Point.SINGLETON;
 					p.x = getConnection().getPoints().getPoint(getIndex()).x;
-					p.y = (int) (getConnection().getPoints().getPoint(
-							getIndex()).y - (curveDepth * 1.5));
+					p.y = (int) (getConnection().getPoints().getPoint(getIndex()).y - (curveDepth * 1.5));
 					getConnection().translateToAbsolute(p);
 					return p;
 				}
@@ -678,10 +663,8 @@ public class GraphConnection extends GraphItem {
 				((PolylineArcConnection) connectionFigure)
 						.setDepth(this.curveDepth);
 			}
-			sourceAnchor = new RoundedChopboxAnchor(
-					getSource().getNodeFigure(), 8);
-			targetAnchor = new RoundedChopboxAnchor(getDestination()
-					.getNodeFigure(), 8);
+			sourceAnchor = new RoundedChopboxAnchor(getSource().getNodeFigure(), 8);
+			targetAnchor = new RoundedChopboxAnchor(getDestination().getNodeFigure(), 8);
 			labelLocator = new MidpointLocator(connectionFigure, 0);
 		}
 
@@ -700,14 +683,12 @@ public class GraphConnection extends GraphItem {
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see
-	 * org.eclipse.mylar.zest.layouts.LayoutRelationship#isBidirectionalInLayout
-	 * ()
+	 * org.eclipse.mylar.zest.layouts.LayoutRelationship#isBidirectionalInLayout ()
 	 */
 	private boolean isBidirectionalInLayout() {
-		return !ZestStyles.checkStyle(connectionStyle,
-				ZestStyles.CONNECTIONS_DIRECTED);
+		return !ZestStyles.checkStyle(connectionStyle, ZestStyles.CONNECTIONS_DIRECTED);
 	}
 
 	public class GraphLayoutConnection implements LayoutRelationship {
@@ -732,8 +713,7 @@ public class GraphConnection extends GraphItem {
 		}
 
 		public void populateLayoutConstraint(LayoutConstraint constraint) {
-			graphModel.invokeConstraintAdapters(GraphConnection.this,
-					constraint);
+			graphModel.invokeConstraintAdapters(GraphConnection.this, constraint);
 		}
 
 		public void setBendPoints(LayoutBendPoint[] bendPoints) {

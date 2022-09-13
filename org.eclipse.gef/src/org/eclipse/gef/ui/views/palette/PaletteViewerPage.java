@@ -45,8 +45,7 @@ public class PaletteViewerPage extends Page implements PalettePage, IAdaptable {
 	/**
 	 * Constructor
 	 * 
-	 * @param pvProvider
-	 *            the provider used to create the palette viewer
+	 * @param pvProvider the provider used to create the palette viewer
 	 */
 	public PaletteViewerPage(PaletteViewerProvider pvProvider) {
 		Assert.isNotNull(pvProvider);
@@ -77,14 +76,14 @@ public class PaletteViewerPage extends Page implements PalettePage, IAdaptable {
 	/**
 	 * @see IAdaptable#getAdapter(java.lang.Class)
 	 */
-	public Object getAdapter(Class adapter) {
+	@Override
+	public <T> T getAdapter(final Class<T> adapter) {
 		if (adapter == EditPart.class && viewer != null)
-			return viewer.getEditPartRegistry().get(viewer.getPaletteRoot());
+			return adapter.cast(viewer.getEditPartRegistry().get(viewer.getPaletteRoot()));
 		if (adapter == IFigure.class && viewer != null) {
-			Object obj = viewer.getEditPartRegistry().get(
-					viewer.getPaletteRoot());
+			Object obj = viewer.getEditPartRegistry().get(viewer.getPaletteRoot());
 			if (obj instanceof GraphicalEditPart)
-				return ((GraphicalEditPart) obj).getFigure();
+				return adapter.cast(((GraphicalEditPart) obj).getFigure());
 		}
 		return null;
 	}
