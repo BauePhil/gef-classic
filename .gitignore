@@ -14,5 +14,4 @@ Snap.*
 .polyglot.META-INF
 *.class
 .polyglot*.xml
-
-/.metadata/
+.metadata/
