@@ -230,7 +230,7 @@ public abstract class AbstractStructuredGraphViewer extends AbstractZoomableView
 	HashMap getNodesMap() {
 		return this.nodesMap;
 	}
-
+	
 	GraphNode addGraphModelContainer(Object element) {
 		GraphNode node = this.getGraphModelNode(element);
 		if (node == null) {
@@ -249,6 +249,34 @@ public abstract class AbstractStructuredGraphViewer extends AbstractZoomableView
 			node.setData(element);
 		}
 		return node;
+	}
+	
+	/**
+	 * Implement and return the new node object, enables to define custom graph nodes
+	 * 
+	 * @param graphModel where the created nodes gets added to
+	 * @param figure of the created node object
+	 * @return instance of a {@link GraphNode}
+	 * 
+	 * @since 1.7 
+	 */
+	protected GraphNode createNodeObject(final Graph graphModel, IFigure figure) {
+		return new CGraphNode(graphModel, SWT.NONE, figure);
+	}
+
+	/**
+	 * Implement and return the new connection object, enables to define custom graph connections
+	 * 
+	 * @param graphModel where the created nodes gets added to
+	 * @param source {@link GraphNode}
+	 * @param destination {@link GraphNode}
+	 * @return instance of a {@link GraphConnection}
+	 * 
+	 * @since 1.7 
+	 */
+	protected GraphConnection createConnectionObject(final Graph graphModel, final GraphNode source, 
+			final GraphNode destination) {
+		return new GraphConnection(graphModel, SWT.NONE, source, destination);
 	}
 
 	GraphNode addGraphModelNode(Object element, IFigure figure) {

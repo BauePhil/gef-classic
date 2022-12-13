@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2010 IBM Corporation and others.
+ * Copyright (c) 2000, 2022 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -24,8 +24,9 @@ import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.actions.ActionFactory;
 import org.eclipse.ui.part.CellEditorActionHandler;
 
+import org.eclipse.draw2d.zoom.ZoomListener;
+
 import org.eclipse.gef.GraphicalEditPart;
-import org.eclipse.gef.editparts.ZoomListener;
 import org.eclipse.gef.editparts.ZoomManager;
 import org.eclipse.gef.tools.CellEditorLocator;
 import org.eclipse.gef.tools.DirectEditManager;
@@ -39,11 +40,8 @@ public class LogicLabelEditManager extends DirectEditManager {
 	private IAction copy, cut, paste, undo, redo, find, selectAll, delete;
 	private double cachedZoom = -1.0;
 	private Font scaledFont;
-	private ZoomListener zoomListener = new ZoomListener() {
-		public void zoomChanged(double newZoom) {
-			updateScaledFont(newZoom);
-		}
-	};
+
+	private ZoomListener zoomListener = LogicLabelEditManager.this::updateScaledFont;
 
 	public LogicLabelEditManager(GraphicalEditPart source, CellEditorLocator locator) {
 		super(source, null, locator);
@@ -52,6 +50,7 @@ public class LogicLabelEditManager extends DirectEditManager {
 	/**
 	 * @see org.eclipse.gef.tools.DirectEditManager#bringDown()
 	 */
+	@Override
 	protected void bringDown() {
 		ZoomManager zoomMgr = (ZoomManager) getEditPart().getViewer().getProperty(ZoomManager.class.toString());
 		if (zoomMgr != null)
@@ -72,6 +71,7 @@ public class LogicLabelEditManager extends DirectEditManager {
 		disposeScaledFont();
 	}
 
+	@Override
 	protected CellEditor createCellEditorOn(Composite composite) {
 		return new TextCellEditor(composite, SWT.MULTI | SWT.WRAP);
 	}
@@ -83,6 +83,7 @@ public class LogicLabelEditManager extends DirectEditManager {
 		}
 	}
 
+	@Override
 	protected void initCellEditor() {
 		// update text
 		LabelFigure stickyNote = (LabelFigure) getEditPart().getFigure();
@@ -144,7 +145,8 @@ public class LogicLabelEditManager extends DirectEditManager {
 		else {
 			FontData fd = font.getFontData()[0];
 			fd.setHeight((int) (fd.getHeight() * zoom));
-			text.setFont(scaledFont = new Font(null, fd));
+			scaledFont = new Font(null, fd);
+			text.setFont(scaledFont);
 		}
 	}
 
