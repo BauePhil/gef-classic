@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2003, 2010 IBM Corporation and others.
+ * Copyright (c) 2003, 2023 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -30,6 +30,7 @@ import org.eclipse.gef.RequestConstants;
 import org.eclipse.gef.editparts.AbstractGraphicalEditPart;
 import org.eclipse.gef.examples.flow.model.Activity;
 import org.eclipse.gef.examples.flow.model.FlowElement;
+import org.eclipse.gef.examples.flow.model.Transition;
 import org.eclipse.gef.examples.flow.policies.ActivityDirectEditPolicy;
 import org.eclipse.gef.examples.flow.policies.ActivityEditPolicy;
 import org.eclipse.gef.examples.flow.policies.ActivityNodeEditPolicy;
@@ -46,9 +47,10 @@ public abstract class ActivityPart extends AbstractGraphicalEditPart implements 
 	/**
 	 * @see org.eclipse.gef.EditPart#activate()
 	 */
+	@Override
 	public void activate() {
 		super.activate();
-		getActivity().addPropertyChangeListener(this);
+		getModel().addPropertyChangeListener(this);
 	}
 
 	protected void applyGraphResults(CompoundDirectedGraph graph, Map map) {
@@ -67,10 +69,7 @@ public abstract class ActivityPart extends AbstractGraphicalEditPart implements 
 			TransitionPart part = (TransitionPart) getSourceConnections().get(i);
 			part.contributeToGraph(graph, map);
 		}
-		for (int i = 0; i < getChildren().size(); i++) {
-			ActivityPart child = (ActivityPart) children.get(i);
-			child.contributeEdgesToGraph(graph, map);
-		}
+		getChildren().forEach(child -> child.contributeEdgesToGraph(graph, map));
 	}
 
 	public abstract void contributeNodesToGraph(CompoundDirectedGraph graph, Subgraph s, Map map);
@@ -78,6 +77,7 @@ public abstract class ActivityPart extends AbstractGraphicalEditPart implements 
 	/**
 	 * @see org.eclipse.gef.editparts.AbstractEditPart#createEditPolicies()
 	 */
+	@Override
 	protected void createEditPolicies() {
 		installEditPolicy(EditPolicy.GRAPHICAL_NODE_ROLE, new ActivityNodeEditPolicy());
 		installEditPolicy(EditPolicy.CONTAINER_ROLE, new ActivitySourceEditPolicy());
@@ -88,9 +88,10 @@ public abstract class ActivityPart extends AbstractGraphicalEditPart implements 
 	/**
 	 * @see org.eclipse.gef.EditPart#deactivate()
 	 */
+	@Override
 	public void deactivate() {
 		super.deactivate();
-		getActivity().removePropertyChangeListener(this);
+		getModel().removePropertyChangeListener(this);
 	}
 
 	/**
@@ -98,22 +99,31 @@ public abstract class ActivityPart extends AbstractGraphicalEditPart implements 
 	 * 
 	 * @return the Activity model
 	 */
-	protected Activity getActivity() {
-		return (Activity) getModel();
+	@Override
+	public Activity getModel() {
+		return (Activity) super.getModel();
+	}
+
+	@SuppressWarnings("unchecked") // children of an ActivityPart are ActivityParts
+	@Override
+	public List<? extends ActivityPart> getChildren() {
+		return (List<? extends ActivityPart>) super.getChildren();
 	}
 
 	/**
 	 * @see org.eclipse.gef.editparts.AbstractGraphicalEditPart#getModelSourceConnections()
 	 */
-	protected List getModelSourceConnections() {
-		return getActivity().getOutgoingTransitions();
+	@Override
+	protected List<Transition> getModelSourceConnections() {
+		return getModel().getOutgoingTransitions();
 	}
 
 	/**
 	 * @see org.eclipse.gef.editparts.AbstractGraphicalEditPart#getModelTargetConnections()
 	 */
-	protected List getModelTargetConnections() {
-		return getActivity().getIncomingTransitions();
+	@Override
+	protected List<Transition> getModelTargetConnections() {
+		return getModel().getIncomingTransitions();
 	}
 
 	abstract int getAnchorOffset();
@@ -121,6 +131,7 @@ public abstract class ActivityPart extends AbstractGraphicalEditPart implements 
 	/**
 	 * @see NodeEditPart#getSourceConnectionAnchor(org.eclipse.gef.ConnectionEditPart)
 	 */
+	@Override
 	public ConnectionAnchor getSourceConnectionAnchor(ConnectionEditPart connection) {
 		return new BottomAnchor(getFigure(), getAnchorOffset());
 	}
@@ -128,6 +139,7 @@ public abstract class ActivityPart extends AbstractGraphicalEditPart implements 
 	/**
 	 * @see org.eclipse.gef.NodeEditPart#getSourceConnectionAnchor(org.eclipse.gef.Request)
 	 */
+	@Override
 	public ConnectionAnchor getSourceConnectionAnchor(Request request) {
 		return new BottomAnchor(getFigure(), getAnchorOffset());
 	}
@@ -135,6 +147,7 @@ public abstract class ActivityPart extends AbstractGraphicalEditPart implements 
 	/**
 	 * @see NodeEditPart#getTargetConnectionAnchor(org.eclipse.gef.ConnectionEditPart)
 	 */
+	@Override
 	public ConnectionAnchor getTargetConnectionAnchor(ConnectionEditPart connection) {
 		return new TopAnchor(getFigure(), getAnchorOffset());
 	}
@@ -142,6 +155,7 @@ public abstract class ActivityPart extends AbstractGraphicalEditPart implements 
 	/**
 	 * @see org.eclipse.gef.NodeEditPart#getTargetConnectionAnchor(org.eclipse.gef.Request)
 	 */
+	@Override
 	public ConnectionAnchor getTargetConnectionAnchor(Request request) {
 		return new TopAnchor(getFigure(), getAnchorOffset());
 	}
@@ -152,6 +166,7 @@ public abstract class ActivityPart extends AbstractGraphicalEditPart implements 
 	/**
 	 * @see org.eclipse.gef.EditPart#performRequest(org.eclipse.gef.Request)
 	 */
+	@Override
 	public void performRequest(Request request) {
 		if (request.getType() == RequestConstants.REQ_DIRECT_EDIT)
 			performDirectEdit();
@@ -160,6 +175,7 @@ public abstract class ActivityPart extends AbstractGraphicalEditPart implements 
 	/**
 	 * @see java.beans.PropertyChangeListener#propertyChange(java.beans.PropertyChangeEvent)
 	 */
+	@Override
 	public void propertyChange(PropertyChangeEvent evt) {
 		String prop = evt.getPropertyName();
 		if (FlowElement.CHILDREN.equals(prop))
@@ -178,6 +194,7 @@ public abstract class ActivityPart extends AbstractGraphicalEditPart implements 
 	/**
 	 * @see org.eclipse.gef.editparts.AbstractGraphicalEditPart#setFigure(org.eclipse.draw2d.IFigure)
 	 */
+	@Override
 	protected void setFigure(IFigure figure) {
 		figure.getBounds().setSize(0, 0);
 		super.setFigure(figure);
@@ -186,6 +203,7 @@ public abstract class ActivityPart extends AbstractGraphicalEditPart implements 
 	/**
 	 * @see org.eclipse.gef.editparts.AbstractEditPart#toString()
 	 */
+	@Override
 	public String toString() {
 		return getModel().toString();
 	}

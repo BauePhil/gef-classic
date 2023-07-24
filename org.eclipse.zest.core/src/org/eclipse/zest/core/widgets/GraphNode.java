@@ -1,11 +1,11 @@
 /*******************************************************************************
- * Copyright 2005, CHISEL Group, University of Victoria, Victoria, BC, Canada.
+ * Copyright 2005, 2023, CHISEL Group, University of Victoria, Victoria, BC, Canada.
  * All rights reserved. This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License v1.0 which
  * accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
- * Contributors: The Chisel Group, University of Victoria
+ *
+ * Contributors: The Chisel Group, University of Victoria, Sebastian Hollersbacher
  ******************************************************************************/
 package org.eclipse.zest.core.widgets;
 
@@ -27,6 +27,7 @@ import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.graphics.FontData;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.Display;
+import org.eclipse.zest.core.widgets.internal.ContainerFigure;
 import org.eclipse.zest.core.widgets.internal.GraphLabel;
 import org.eclipse.zest.layouts.LayoutEntity;
 import org.eclipse.zest.layouts.constraints.LayoutConstraint;
@@ -34,12 +35,14 @@ import org.eclipse.zest.layouts.constraints.LayoutConstraint;
 /**
  * Simple node class which has the following properties: color, size, location,
  * and a label. It also has a list of connections and anchors.
- * 
+ *
  * @author Chris Callendar
- * 
+ *
  * @author Del Myers
- * 
+ *
  * @author Ian Bull
+ *
+ * @author Sebastian Hollersbacher
  */
 public class GraphNode extends GraphItem {
 	public static final int HIGHLIGHT_NONE = 0;
@@ -77,6 +80,16 @@ public class GraphNode extends GraphItem {
 	private IFigure tooltip;
 	protected IFigure nodeFigure;
 
+	/**
+	 * @since 1.8
+	 */
+	private IFigure modelFigure;
+
+	/**
+	 * @since 1.8
+	 */
+	private HideNodeHelper hideNodeHelper;
+
 	private boolean isDisposed = false;
 	private boolean hasCustomTooltip;
 
@@ -103,7 +116,7 @@ public class GraphNode extends GraphItem {
 	public GraphNode(IContainer graphModel, int style, String text, Image image, Object data) {
 		super(graphModel.getGraph(), style, data);
 		initModel(graphModel, text, image);
-		if (nodeFigure == null) {
+		if (modelFigure == null) {
 			initFigure();
 		}
 
@@ -119,7 +132,15 @@ public class GraphNode extends GraphItem {
 	}
 
 	protected void initFigure() {
-		nodeFigure = createFigureForModel();
+		modelFigure = createFigureForModel();
+		if (graph.getHideNodesEnabled() && !checkStyle(ZestStyles.NODES_FISHEYE)) {
+			nodeFigure = new ContainerFigure();
+			nodeFigure.add(modelFigure);
+			hideNodeHelper = new HideNodeHelper(this);
+			nodeFigure.setToolTip(modelFigure.getToolTip());
+		} else {
+			nodeFigure = modelFigure;
+		}
 	}
 
 	static int count = 0;
@@ -168,7 +189,7 @@ public class GraphNode extends GraphItem {
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see org.eclipse.mylar.zest.core.widgets.GraphItem#dispose()
 	 */
 	public void dispose() {
@@ -198,7 +219,7 @@ public class GraphNode extends GraphItem {
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see org.eclipse.swt.widgets.Widget#isDisposed()
 	 */
 	public boolean isDisposed() {
@@ -208,7 +229,7 @@ public class GraphNode extends GraphItem {
 	/**
 	 * Determines if this node has a fixed size or if it is packed to the size of
 	 * its contents. To set a node to pack, set its size (-1, -1)
-	 * 
+	 *
 	 * @return
 	 */
 	public boolean isSizeFixed() {
@@ -217,7 +238,7 @@ public class GraphNode extends GraphItem {
 
 	/**
 	 * Returns a new list of the source connections (GraphModelConnection objects).
-	 * 
+	 *
 	 * @return List a new list of GraphModelConnect objects
 	 */
 	public List getSourceConnections() {
@@ -226,7 +247,7 @@ public class GraphNode extends GraphItem {
 
 	/**
 	 * Returns a new list of the target connections (GraphModelConnection objects).
-	 * 
+	 *
 	 * @return List a new list of GraphModelConnect objects
 	 */
 	public List getTargetConnections() {
@@ -236,7 +257,7 @@ public class GraphNode extends GraphItem {
 	/**
 	 * Returns the bounds of this node. It is just the combination of the location
 	 * and the size.
-	 * 
+	 *
 	 * @return Rectangle
 	 */
 	Rectangle getBounds() {
@@ -245,7 +266,7 @@ public class GraphNode extends GraphItem {
 
 	/**
 	 * Returns a copy of the node's location.
-	 * 
+	 *
 	 * @return Point
 	 */
 	public Point getLocation() {
@@ -254,7 +275,7 @@ public class GraphNode extends GraphItem {
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see
 	 * org.eclipse.mylar.zest.core.internal.graphmodel.IGraphModelNode#isSelected ()
 	 */
@@ -273,12 +294,21 @@ public class GraphNode extends GraphItem {
 
 	/**
 	 * Returns a copy of the node's size.
-	 * 
+	 *
 	 * @return Dimension
 	 */
 	public Dimension getSize() {
-		if (size.height < 0 && size.width < 0 && nodeFigure != null) {
-			return nodeFigure.getSize().getCopy();
+		if (size.height < 0 && size.width < 0 && modelFigure != null) {
+			// return size of node calculated from the model
+			Dimension modelSize = modelFigure.getSize();
+			if (hideNodeHelper != null) {
+				if (modelSize.equals(-1, -1)) {
+					modelSize = modelFigure.getPreferredSize();
+				}
+				modelSize.width = modelSize.width + 2 * HideNodeHelper.MARGIN;
+				modelSize.height = modelSize.height + 2 * HideNodeHelper.MARGIN;
+			}
+			return modelSize;
 		}
 		return size.getCopy();
 	}
@@ -295,7 +325,7 @@ public class GraphNode extends GraphItem {
 	 */
 	public void setForegroundColor(Color c) {
 		this.foreColor = c;
-		updateFigureForModel(nodeFigure);
+		updateFigureForModel(modelFigure);
 	}
 
 	/**
@@ -310,12 +340,12 @@ public class GraphNode extends GraphItem {
 	/**
 	 * Permanently sets the background color (unhighlighted). This color has no
 	 * effect if a custom figure has been set.
-	 * 
+	 *
 	 * @param c
 	 */
 	public void setBackgroundColor(Color c) {
 		backColor = c;
-		updateFigureForModel(nodeFigure);
+		updateFigureForModel(modelFigure);
 	}
 
 	/**
@@ -326,7 +356,7 @@ public class GraphNode extends GraphItem {
 	public void setTooltip(IFigure tooltip) {
 		hasCustomTooltip = true;
 		this.tooltip = tooltip;
-		updateFigureForModel(nodeFigure);
+		updateFigureForModel(modelFigure);
 	}
 
 	/**
@@ -339,22 +369,22 @@ public class GraphNode extends GraphItem {
 
 	/**
 	 * Sets the border color.
-	 * 
+	 *
 	 * @param c the border color.
 	 */
 	public void setBorderColor(Color c) {
 		borderColor = c;
-		updateFigureForModel(nodeFigure);
+		updateFigureForModel(modelFigure);
 	}
 
 	/**
 	 * Sets the highlighted border color.
-	 * 
+	 *
 	 * @param c the highlighted border color.
 	 */
 	public void setBorderHighlightColor(Color c) {
 		this.borderHighlightColor = c;
-		updateFigureForModel(nodeFigure);
+		updateFigureForModel(modelFigure);
 	}
 
 	/**
@@ -416,7 +446,7 @@ public class GraphNode extends GraphItem {
 			((Graph) parent).highlightNode(this);
 		}
 		highlighted = HIGHLIGHT_ON;
-		updateFigureForModel(getNodeFigure());
+		updateFigureForModel(modelFigure);
 	}
 
 	/**
@@ -448,27 +478,31 @@ public class GraphNode extends GraphItem {
 			((Graph) parent).unhighlightNode(this);
 		}
 		highlighted = HIGHLIGHT_NONE;
-		updateFigureForModel(nodeFigure);
+		updateFigureForModel(modelFigure);
 
 	}
 
 	protected void refreshLocation() {
-		Point loc = this.getLocation();
-		Dimension size = this.getSize();
-		Rectangle bounds = new Rectangle(loc, size);
+		Point loc = getLocation();
+		Dimension nodeSize = getSize();
+		Rectangle bounds = new Rectangle(loc, nodeSize);
 
 		if (nodeFigure == null || nodeFigure.getParent() == null) {
 			return; // node figure has not been created yet
 		}
-		// nodeFigure.setBounds(bounds);
+
+		if (hideNodeHelper != null) {
+			hideNodeHelper.updateNodeBounds(bounds);
+		}
 		nodeFigure.getParent().setConstraint(nodeFigure, bounds);
+
 	}
 
 	/**
 	 * Highlights this node using the adjacent highlight color. This only does
 	 * something if highlighAdjacentNodes is set to true and if the node isn't
 	 * already highlighted.
-	 * 
+	 *
 	 * @see #setHighlightAdjacentNodes(boolean)
 	 */
 	// @tag ADJACENT : removed highlight adjacent
@@ -483,7 +517,7 @@ public class GraphNode extends GraphItem {
 	/**
 	 * Returns if the nodes adjacent to this node will be highlighted when this node
 	 * is selected.
-	 * 
+	 *
 	 * @return GraphModelNode
 	 */
 	// @tag ADJACENT : Removed highlight adjacent
@@ -495,7 +529,7 @@ public class GraphNode extends GraphItem {
 	/**
 	 * Sets if the adjacent nodes to this one should be highlighted when this node
 	 * is selected.
-	 * 
+	 *
 	 * @param highlightAdjacentNodes The highlightAdjacentNodes to set.
 	 */
 	// @tag ADJACENT : Removed highlight adjacent
@@ -517,7 +551,7 @@ public class GraphNode extends GraphItem {
 
 	public void setBorderWidth(int width) {
 		this.borderWidth = width;
-		updateFigureForModel(nodeFigure);
+		updateFigureForModel(modelFigure);
 	}
 
 	public Font getFont() {
@@ -526,12 +560,12 @@ public class GraphNode extends GraphItem {
 
 	public void setFont(Font font) {
 		this.font = font;
-		updateFigureForModel(nodeFigure);
+		updateFigureForModel(modelFigure);
 	}
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see org.eclipse.swt.widgets.Item#setText(java.lang.String)
 	 */
 	public void setText(String string) {
@@ -541,25 +575,25 @@ public class GraphNode extends GraphItem {
 		super.setText(string);
 
 		if (nodeFigure != null) {
-			updateFigureForModel(this.nodeFigure);
+			updateFigureForModel(modelFigure);
 		}
 	}
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see org.eclipse.swt.widgets.Item#setImage(org.eclipse.swt.graphics.Image)
 	 */
 	public void setImage(Image image) {
 		super.setImage(image);
 		if (nodeFigure != null) {
-			updateFigureForModel(nodeFigure);
+			updateFigureForModel(modelFigure);
 		}
 	}
 
 	/**
 	 * Gets the graphModel that this node is contained in
-	 * 
+	 *
 	 * @return The graph model that this node is contained in
 	 */
 	public Graph getGraphModel() {
@@ -583,7 +617,7 @@ public class GraphNode extends GraphItem {
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see org.eclipse.mylar.zest.core.internal.graphmodel.IGraphModelNode#setSize
 	 * (double, double)
 	 */
@@ -597,7 +631,7 @@ public class GraphNode extends GraphItem {
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see org.eclipse.mylar.zest.core.internal.graphmodel.IGraphModelNode#
 	 * getBorderHighlightColor()
 	 */
@@ -613,6 +647,11 @@ public class GraphNode extends GraphItem {
 		this.cacheLabel = cacheLabel;
 	}
 
+	/**
+	 * Returns the figure of the whole node.
+	 *
+	 * @return nodeFigure
+	 */
 	public IFigure getNodeFigure() {
 		return this.nodeFigure;
 	}
@@ -620,7 +659,7 @@ public class GraphNode extends GraphItem {
 	public void setVisible(boolean visible) {
 		// graph.addRemoveFigure(this, visible);
 		this.visible = visible;
-		this.getFigure().setVisible(visible);
+		this.getNodeFigure().setVisible(visible);
 		List sConnections = (this).getSourceConnections();
 		List tConnections = (this).getTargetConnections();
 		for (Iterator iterator2 = sConnections.iterator(); iterator2.hasNext();) {
@@ -634,8 +673,43 @@ public class GraphNode extends GraphItem {
 		}
 	}
 
+	/**
+	 * @since 1.8
+	 */
+	public void setModelFigure(IFigure figure) {
+		this.modelFigure = figure;
+	}
+
+	/**
+	 * @since 1.8
+	 */
+	public IFigure getModelFigure() {
+		return this.modelFigure;
+	}
+
+	/**
+	 * @since 1.8
+	 */
+	public void setHideNodeHelper(HideNodeHelper hideNodeHelper) {
+		this.hideNodeHelper = hideNodeHelper;
+	}
+
+	/**
+	 * @since 1.8
+	 */
+	public HideNodeHelper getHideNodeHelper() {
+		return this.hideNodeHelper;
+	}
+
 	public int getStyle() {
 		return super.getStyle() | this.getNodeStyle();
+	}
+
+	/**
+	 * @since 1.8
+	 */
+	protected Rectangle getHideContainerBounds() {
+		return nodeFigure.getBounds();
 	}
 
 	/***************************************************************************
@@ -805,18 +879,30 @@ public class GraphNode extends GraphItem {
 
 	void addSourceConnection(GraphConnection connection) {
 		this.sourceConnections.add(connection);
+		if (hideNodeHelper != null) {
+			hideNodeHelper.addHideNodeListener(connection.getDestination().hideNodeHelper.getHideNodesListener());
+		}
 	}
 
 	void addTargetConnection(GraphConnection connection) {
 		this.targetConnections.add(connection);
+		if (hideNodeHelper != null) {
+			hideNodeHelper.addHideNodeListener(connection.getSource().hideNodeHelper.getHideNodesListener());
+		}
 	}
 
 	void removeSourceConnection(GraphConnection connection) {
 		this.sourceConnections.remove(connection);
+		if (hideNodeHelper != null) {
+			hideNodeHelper.removeHideNodeListener(connection.getDestination().hideNodeHelper.getHideNodesListener());
+		}
 	}
 
 	void removeTargetConnection(GraphConnection connection) {
 		this.targetConnections.remove(connection);
+		if (hideNodeHelper != null) {
+			hideNodeHelper.removeHideNodeListener(connection.getSource().hideNodeHelper.getHideNodesListener());
+		}
 	}
 
 	/**
@@ -836,7 +922,7 @@ public class GraphNode extends GraphItem {
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see org.eclipse.mylar.zest.core.widgets.IGraphItem#getItemType()
 	 */
 	public int getItemType() {
@@ -912,11 +998,17 @@ public class GraphNode extends GraphItem {
 
 	}
 
-	protected IFigure getFigure() {
-		if (this.nodeFigure == null) {
+	/**
+	 * Returns the figure of the model in the node, initialises it, if it doesn't
+	 * exist yet.
+	 *
+	 * @return modelFigure.
+	 */
+	IFigure getFigure() {
+		if (this.modelFigure == null) {
 			initFigure();
 		}
-		return this.getNodeFigure();
+		return this.modelFigure;
 	}
 
 	void paint() {

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2005 IBM Corporation and others.
+ * Copyright (c) 2005, 2023 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -16,6 +16,7 @@ import org.eclipse.draw2d.Figure;
 import org.eclipse.draw2d.FlowLayout;
 import org.eclipse.draw2d.IFigure;
 import org.eclipse.draw2d.LineBorder;
+import org.eclipse.draw2d.OrderedLayout;
 import org.eclipse.draw2d.RectangleFigure;
 import org.eclipse.draw2d.RoundedRectangle;
 import org.eclipse.draw2d.Triangle;
@@ -31,6 +32,7 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Scale;
+import org.eclipse.swt.widgets.Shell;
 
 /**
  * @author hudsonr Created on Apr 30, 2003
@@ -55,9 +57,10 @@ public class FlowLayoutExample extends AbstractExample {
 	}
 
 	/**
-	 * @see org.eclipse.draw2d.examples.AbstractExample#getContents()
+	 * @see org.eclipse.draw2d.examples.AbstractExample#createContents()
 	 */
-	protected IFigure getContents() {
+	@Override
+	protected IFigure createContents() {
 		Figure container = new Figure();
 		container.setBorder(new LineBorder());
 		container.setLayoutManager(layout = new FlowLayout());
@@ -123,64 +126,70 @@ public class FlowLayoutExample extends AbstractExample {
 	/**
 	 * @see org.eclipse.draw2d.examples.AbstractExample#hookShell()
 	 */
-	protected void hookShell() {
+	@Override
+	protected void hookShell(Shell shell) {
 		Composite composite = new Composite(shell, 0);
 		composite.setLayoutData(new GridData(GridData.FILL_VERTICAL));
 
 		composite.setLayout(new GridLayout());
 
 		final Button horizontal = new Button(composite, SWT.CHECK);
-		horizontal.setText("Horizontal");
+		horizontal.setText("Horizontal"); //$NON-NLS-1$
 		horizontal.setSelection(true);
 		horizontal.addSelectionListener(new SelectionAdapter() {
+			@Override
 			public void widgetSelected(SelectionEvent e) {
 				layout.setHorizontal(!layout.isHorizontal());
 				resetShapes();
-				contents.revalidate();
+				getContents().revalidate();
 				shell.layout(true);
 			}
 		});
 		final Button stretch = new Button(composite, SWT.CHECK);
-		stretch.setText("Stretch Minor Axis");
+		stretch.setText("Stretch Minor Axis"); //$NON-NLS-1$
 		stretch.setSelection(false);
 		stretch.addSelectionListener(new SelectionAdapter() {
+			@Override
 			public void widgetSelected(SelectionEvent e) {
 				layout.setStretchMinorAxis(stretch.getSelection());
 				resetShapes();
-				contents.revalidate();
+				getContents().revalidate();
 				shell.layout(true);
 			}
 		});
 		{
 			Group major = new Group(composite, 0);
 			major.setLayout(new FillLayout(SWT.VERTICAL));
-			major.setText("Major Axis");
+			major.setText("Major Axis"); //$NON-NLS-1$
 
 			Button left = new Button(major, SWT.RADIO);
-			left.setText("Top/Left");
+			left.setText("Top/Left"); //$NON-NLS-1$
 			left.setSelection(true);
 			left.addSelectionListener(new SelectionAdapter() {
+				@Override
 				public void widgetSelected(SelectionEvent e) {
-					layout.setMajorAlignment(FlowLayout.ALIGN_LEFTTOP);
-					contents.revalidate();
+					layout.setMajorAlignment(FlowLayout.ALIGN_TOPLEFT);
+					getContents().revalidate();
 				}
 			});
 
 			Button center = new Button(major, SWT.RADIO);
-			center.setText("Middle/Center");
+			center.setText("Middle/Center"); //$NON-NLS-1$
 			center.addSelectionListener(new SelectionAdapter() {
+				@Override
 				public void widgetSelected(SelectionEvent e) {
 					layout.setMajorAlignment(FlowLayout.ALIGN_CENTER);
-					contents.revalidate();
+					getContents().revalidate();
 				}
 			});
 
 			Button right = new Button(major, SWT.RADIO);
-			right.setText("Buttom/Right");
+			right.setText("Buttom/Right"); //$NON-NLS-1$
 			right.addSelectionListener(new SelectionAdapter() {
+				@Override
 				public void widgetSelected(SelectionEvent e) {
-					layout.setMajorAlignment(FlowLayout.ALIGN_RIGHTBOTTOM);
-					contents.revalidate();
+					layout.setMajorAlignment(FlowLayout.ALIGN_BOTTOMRIGHT);
+					getContents().revalidate();
 				}
 			});
 
@@ -189,46 +198,50 @@ public class FlowLayoutExample extends AbstractExample {
 			spacing.setMaximum(20);
 			spacing.setSelection(5);
 			spacing.addSelectionListener(new SelectionAdapter() {
+				@Override
 				public void widgetSelected(SelectionEvent e) {
 					layout.setMajorSpacing(spacing.getSelection());
-					contents.revalidate();
+					getContents().revalidate();
 				}
 			});
 			Label spacingLabel = new Label(major, SWT.CENTER);
-			spacingLabel.setText("Spacing");
+			spacingLabel.setText("Spacing"); //$NON-NLS-1$
 		}
 
 		{
 
 			Group minor = new Group(composite, 0);
 			minor.setLayout(new FillLayout(SWT.VERTICAL));
-			minor.setText("minor axis");
+			minor.setText("minor axis"); //$NON-NLS-1$
 
 			Button left = new Button(minor, SWT.RADIO);
-			left.setText("Top/Left");
+			left.setText("Top/Left"); //$NON-NLS-1$
 			left.setSelection(true);
 			left.addSelectionListener(new SelectionAdapter() {
+				@Override
 				public void widgetSelected(SelectionEvent e) {
-					layout.setMinorAlignment(FlowLayout.ALIGN_LEFTTOP);
-					contents.revalidate();
+					layout.setMinorAlignment(OrderedLayout.ALIGN_TOPLEFT);
+					getContents().revalidate();
 				}
 			});
 
 			Button center = new Button(minor, SWT.RADIO);
-			center.setText("Middle/Center");
+			center.setText("Middle/Center"); //$NON-NLS-1$
 			center.addSelectionListener(new SelectionAdapter() {
+				@Override
 				public void widgetSelected(SelectionEvent e) {
 					layout.setMinorAlignment(FlowLayout.ALIGN_CENTER);
-					contents.revalidate();
+					getContents().revalidate();
 				}
 			});
 
 			Button right = new Button(minor, SWT.RADIO);
-			right.setText("Buttom/Right");
+			right.setText("Buttom/Right"); //$NON-NLS-1$
 			right.addSelectionListener(new SelectionAdapter() {
+				@Override
 				public void widgetSelected(SelectionEvent e) {
-					layout.setMinorAlignment(FlowLayout.ALIGN_RIGHTBOTTOM);
-					contents.revalidate();
+					layout.setMinorAlignment(OrderedLayout.ALIGN_BOTTOMRIGHT);
+					getContents().revalidate();
 				}
 			});
 
@@ -237,13 +250,14 @@ public class FlowLayoutExample extends AbstractExample {
 			spacing.setMaximum(20);
 			spacing.setSelection(5);
 			spacing.addSelectionListener(new SelectionAdapter() {
+				@Override
 				public void widgetSelected(SelectionEvent e) {
 					layout.setMinorSpacing(spacing.getSelection());
-					contents.revalidate();
+					getContents().revalidate();
 				}
 			});
 			Label spacingLabel = new Label(minor, SWT.CENTER);
-			spacingLabel.setText("Spacing");
+			spacingLabel.setText("Spacing"); //$NON-NLS-1$
 		}
 	}
 

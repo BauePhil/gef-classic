@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2010 IBM Corporation and others.
+ * Copyright (c) 2000, 2023 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -400,6 +400,28 @@ public class Rectangle implements Cloneable, java.io.Serializable, Translatable 
 	}
 
 	/**
+	 * Returns a new Interval beginning at the x coordinate with the width as
+	 * length.
+	 * 
+	 * @return the {@link Interval} of projection on X axis.
+	 * @since 3.13
+	 */
+	public Interval getHorizontalInterval() {
+		return new Interval(x, width);
+	}
+
+	/**
+	 * Returns a new Interval beginning at the y coordinate with the height as
+	 * length.
+	 * 
+	 * @return the {@link Interval} of projection on Y axis.
+	 * @since 3.13
+	 */
+	public Interval getVerticalInterval() {
+		return new Interval(y, height);
+	}
+
+	/**
 	 * Returns a new Point representing the middle point of the left hand side of
 	 * this Rectangle.
 	 * 
@@ -706,6 +728,16 @@ public class Rectangle implements Cloneable, java.io.Serializable, Translatable 
 	}
 
 	/**
+	 * Returns the X-coordinate of the left side of this Rectangle.
+	 * 
+	 * @return The X coordinate of the left side
+	 * @since 3.13
+	 */
+	public int left() {
+		return x;
+	}
+
+	/**
 	 * Returns <code>true</code> if this Rectangle's width or height is less than or
 	 * equal to 0.
 	 * 
@@ -900,6 +932,20 @@ public class Rectangle implements Cloneable, java.io.Serializable, Translatable 
 	}
 
 	/**
+	 * Updates the height to match the specified {@link #bottom()} coordinate. If
+	 * the new Y coordinate of the bottom happens to be smaller (i.e. above) than
+	 * the Y coordinate of the top, the height is set to {@code 0}.
+	 * 
+	 * @param newBottom The Y coordinate of the bottom
+	 * @return <code>this</code> for convenience
+	 * @since 3.13
+	 */
+	public Rectangle setBottom(int newBottom) {
+		height = Math.max(0, newBottom - y);
+		return this;
+	}
+
+	/**
 	 * Sets the height of this Rectangle to the specified one.
 	 * 
 	 * @param height The new height
@@ -936,6 +982,20 @@ public class Rectangle implements Cloneable, java.io.Serializable, Translatable 
 	 */
 	public Rectangle setLocation(Point p) {
 		return setLocation(p.x(), p.y());
+	}
+
+	/**
+	 * Updates the width to match the specified {@link #right()} coordinate. If the
+	 * new X coordinate of the right happens to be smaller than the X coordinate of
+	 * the left (i.e. behind), the width is set to {@code 0}.
+	 * 
+	 * @param newRight The X coordinate of the right
+	 * @return <code>this</code> for convenience
+	 * @since 3.13
+	 */
+	public Rectangle setRight(int newRight) {
+		width = Math.max(0, newRight - x);
+		return this;
 	}
 
 	/**
@@ -1025,16 +1085,18 @@ public class Rectangle implements Cloneable, java.io.Serializable, Translatable 
 	public Rectangle shrink(Insets insets) {
 		if (insets == null)
 			return this;
-		x += insets.left;
-		y += insets.top;
-		width -= (insets.getWidth());
-		height -= (insets.getHeight());
+		shrinkLeft(insets.left);
+		shrinkTop(insets.top);
+		width = Math.max(0, width - insets.right);
+		height = Math.max(0, height - insets.bottom);
 		return this;
 	}
 
 	/**
 	 * Shrinks the sides of this Rectangle by the horizontal and vertical values
-	 * provided as input, and returns this Rectangle for convenience. The center of
+	 * provided as input, and returns this Rectangle for convenience. If the given
+	 * reduction amount of larger than the current {@link #width()} or
+	 * {@link #height()} of the rectangle, {@code 0} is used instead. The center of
 	 * this Rectangle is kept constant.
 	 * 
 	 * @param h Horizontal reduction amount
@@ -1043,11 +1105,52 @@ public class Rectangle implements Cloneable, java.io.Serializable, Translatable 
 	 * @since 2.0
 	 */
 	public Rectangle shrink(int h, int v) {
-		x += h;
-		width -= (h + h);
-		y += v;
-		height -= (v + v);
+		Point center = getCenter();
+		x = Math.min(center.x, x + h);
+		width = Math.max(0, width - 2 * h);
+		y = Math.min(center.y, y + v);
+		height = Math.max(0, height - 2 * v);
 		return this;
+	}
+
+	/**
+	 * Shrinks the width of the rectangle by the given amount, keeping
+	 * {@link #right()}. If the delta happens to be larger than the {@link #width()}
+	 * of the rectangle, the new width is set to {@code 0}.
+	 * 
+	 * @param deltaX The horizontal reduction amount
+	 * @return <code>this</code> for convenience
+	 * @since 3.13
+	 */
+	public Rectangle shrinkLeft(int deltaX) {
+		x = Math.min(x + deltaX, right());
+		width = Math.max(0, width - deltaX);
+		return this;
+	}
+
+	/**
+	 * Shrinks the height of the rectangle by the given amount, keeping
+	 * {@link #bottom()}. If the delta happens to be larger than the
+	 * {@link #height()} of the rectangle, the new height is set to {@code 0}.
+	 * 
+	 * @param deltaY The vertical reduction amount
+	 * @return <code>this</code> for convenience
+	 * @since 3.13
+	 */
+	public Rectangle shrinkTop(int deltaY) {
+		y = Math.min(y + deltaY, bottom());
+		height = Math.max(0, height - deltaY);
+		return this;
+	}
+
+	/**
+	 * Returns the Y-coordinate of the top side of this Rectangle.
+	 * 
+	 * @return The Y coordinate of the top
+	 * @since 3.13
+	 */
+	public int top() {
+		return y;
 	}
 
 	/**

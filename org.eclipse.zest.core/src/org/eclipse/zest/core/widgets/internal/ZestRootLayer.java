@@ -10,6 +10,8 @@
  *******************************************************************************/
 package org.eclipse.zest.core.widgets.internal;
 
+import java.util.List;
+
 import org.eclipse.draw2d.FreeformLayer;
 import org.eclipse.draw2d.IFigure;
 
@@ -17,7 +19,7 @@ import org.eclipse.draw2d.IFigure;
  * The root figure for Zest. The figure is broken up into four segments, 1. The
  * Connections 2. The Nodes 3. The Highlighted Connections 4. The Highlighted
  * Nodes
- * 
+ *
  * @author Ian Bull
  */
 public class ZestRootLayer extends FreeformLayer {
@@ -88,7 +90,7 @@ public class ZestRootLayer extends FreeformLayer {
 		this.numberOfHighlightedNodes++;
 		if (onHighlightBringToFront) {
 			this.getChildren().remove(nodeFigure);
-			this.getChildren().add(highlightNodePosition, nodeFigure);
+			((List<IFigure>) this.getChildren()).add(highlightNodePosition, nodeFigure);
 		}
 		this.invalidate();
 		this.repaint();
@@ -99,7 +101,7 @@ public class ZestRootLayer extends FreeformLayer {
 		int highlightConnectionPosition = getHighlightConnectionPosition();
 		this.numberOfHighlightedConnections++;
 		this.getChildren().remove(connectionFigure);
-		this.getChildren().add(highlightConnectionPosition, connectionFigure);
+		((List<IFigure>) this.getChildren()).add(highlightConnectionPosition, connectionFigure);
 		this.invalidate();
 		this.repaint();
 	}
@@ -116,7 +118,7 @@ public class ZestRootLayer extends FreeformLayer {
 		this.numberOfNodes++;
 		if (onHighlightBringToFront) {
 			this.getChildren().remove(nodeFigure);
-			this.getChildren().add(nodePosition, nodeFigure);
+			((List<IFigure>) this.getChildren()).add(nodePosition, nodeFigure);
 		}
 		this.invalidate();
 		this.repaint();
@@ -132,11 +134,12 @@ public class ZestRootLayer extends FreeformLayer {
 		this.numberOfHighlightedConnections--;
 		this.numberOfConnections++;
 		connectionPosition = getConnectionPosition();
-		this.getChildren().remove(connectionFigure);
+		List<IFigure> children = (List<IFigure>) this.getChildren();
+		children.remove(connectionFigure);
 		if (connectionPosition > this.getChildren().size()) {
-			this.getChildren().add(connectionFigure);
+			children.add(connectionFigure);
 		} else {
-			this.getChildren().add(connectionPosition, connectionFigure);
+			children.add(connectionPosition, connectionFigure);
 		}
 		this.invalidate();
 		this.repaint();

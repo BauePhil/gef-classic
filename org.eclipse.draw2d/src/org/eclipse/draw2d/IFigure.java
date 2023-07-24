@@ -249,7 +249,7 @@ public interface IFigure {
 	 * @return The IFigure at the specified location, excluding any IFigures in
 	 *         collection
 	 */
-	IFigure findFigureAtExcluding(int x, int y, Collection collection);
+	IFigure findFigureAtExcluding(int x, int y, Collection<IFigure> collection);
 
 	/**
 	 * Returns the IFigure located at the given location which will accept mouse
@@ -292,7 +292,7 @@ public interface IFigure {
 	 * 
 	 * @return An unmodifiable list of children by reference
 	 */
-	List getChildren();
+	List<? extends IFigure> getChildren();
 
 	/**
 	 * Returns the rectangular area within this Figure's bounds in which children

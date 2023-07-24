@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2005 IBM Corporation and others.
+ * Copyright (c) 2005, 2023 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -17,10 +17,10 @@ import org.eclipse.draw2d.Graphics;
 import org.eclipse.draw2d.geometry.Transposer;
 
 /**
- * 
+ *
  * @author hudsonr Created on Apr 22, 2003
  */
-public abstract class BranchLayout extends AbstractLayout {
+public abstract class AbstractBranchLayout extends AbstractLayout {
 
 	private Transposer transposer;
 	final TreeBranch branch;
@@ -32,45 +32,51 @@ public abstract class BranchLayout extends AbstractLayout {
 	int[] preferredRowHeights;
 	int rowHeight;
 
-	public BranchLayout(TreeBranch branch) {
+	protected AbstractBranchLayout(TreeBranch branch) {
 		this.branch = branch;
 	}
 
 	abstract void calculateDepth();
 
 	public int[] getContourLeft() {
-		if (cachedContourLeft == null)
+		if (cachedContourLeft == null) {
 			updateContours();
+		}
 		return cachedContourLeft;
 	}
 
 	public int[] getContourRight() {
-		if (cachedContourRight == null)
+		if (cachedContourRight == null) {
 			updateContours();
+		}
 		return cachedContourRight;
 	}
 
 	public int getDepth() {
-		if (!branch.isExpanded())
+		if (!branch.isExpanded()) {
 			return 1;
-		if (depth == -1)
+		}
+		if (depth == -1) {
 			calculateDepth();
+		}
 		return depth;
 	}
 
 	public int[] getPreferredRowHeights() {
-		if (preferredRowHeights == null)
+		if (preferredRowHeights == null) {
 			updateRowHeights();
+		}
 		return preferredRowHeights;
 	}
 
-	List getSubtrees() {
-		return branch.getContentsPane().getChildren();
+	List<TreeBranch> getSubtrees() {
+		return branch.getSubtrees();
 	}
 
 	Transposer getTransposer() {
-		if (transposer == null)
+		if (transposer == null) {
 			transposer = branch.getRoot().getTransposer();
+		}
 		return transposer;
 	}
 
@@ -78,6 +84,7 @@ public abstract class BranchLayout extends AbstractLayout {
 		return branch.getRoot().getMajorSpacing();
 	}
 
+	@Override
 	public void invalidate() {
 		preferredRowHeights = null;
 		cachedContourLeft = null;
@@ -96,7 +103,7 @@ public abstract class BranchLayout extends AbstractLayout {
 		horizontal = value;
 	}
 
-	void setRowHeights(int heights[], int offset) {
+	void setRowHeights(int[] heights, int offset) {
 		if (rowHeight != heights[offset]) {
 			rowHeight = heights[offset];
 			branch.revalidate();

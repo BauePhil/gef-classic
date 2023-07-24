@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2005 IBM Corporation and others.
+ * Copyright (c) 2005, 2023 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -29,6 +29,7 @@ public class ZoomContainer extends Figure {
 	/**
 	 * @see org.eclipse.draw2d.Figure#getClientArea()
 	 */
+	@Override
 	public Rectangle getClientArea(Rectangle rect) {
 		super.getClientArea(rect);
 		rect.width /= zoom;
@@ -36,6 +37,7 @@ public class ZoomContainer extends Figure {
 		return rect;
 	}
 
+	@Override
 	public Dimension getPreferredSize(int wHint, int hHint) {
 		Dimension d = super.getPreferredSize(wHint, hHint);
 		int w = getInsets().getWidth();
@@ -46,16 +48,17 @@ public class ZoomContainer extends Figure {
 	/**
 	 * @see org.eclipse.draw2d.Figure#paintClientArea(Graphics)
 	 */
+	@Override
 	protected void paintClientArea(Graphics graphics) {
-		if (getChildren().isEmpty())
+		if (getChildren().isEmpty()) {
 			return;
-
-		boolean optimizeClip = getBorder() == null || getBorder().isOpaque();
+		}
 
 		ScaledGraphics g = new ScaledGraphics(graphics);
 
-		if (!optimizeClip)
-			g.clipRect(getBounds().getCropped(getInsets()));
+		if (!optimizeClip()) {
+			g.clipRect(getBounds().getShrinked(getInsets()));
+		}
 		g.translate(getBounds().x + getInsets().left, getBounds().y + getInsets().top);
 		g.scale(zoom);
 		g.pushState();
@@ -74,6 +77,7 @@ public class ZoomContainer extends Figure {
 	/**
 	 * @see org.eclipse.draw2d.Figure#translateToParent(Translatable)
 	 */
+	@Override
 	public void translateToParent(Translatable t) {
 		t.performScale(zoom);
 		super.translateToParent(t);
@@ -82,6 +86,7 @@ public class ZoomContainer extends Figure {
 	/**
 	 * @see org.eclipse.draw2d.Figure#translateFromParent(Translatable)
 	 */
+	@Override
 	public void translateFromParent(Translatable t) {
 		super.translateFromParent(t);
 		t.performScale(1 / zoom);
@@ -90,6 +95,7 @@ public class ZoomContainer extends Figure {
 	/**
 	 * @see org.eclipse.draw2d.Figure#useLocalCoordinates()
 	 */
+	@Override
 	protected boolean useLocalCoordinates() {
 		return true;
 	}

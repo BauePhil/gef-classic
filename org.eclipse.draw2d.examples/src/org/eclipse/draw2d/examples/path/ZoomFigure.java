@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2008 IBM Corporation and others.
+ * Copyright (c) 2008, 2023 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -29,19 +29,21 @@ public class ZoomFigure extends Figure implements ScalableFigure {
 	/*
 	 * @see org.eclipse.draw2d.Figure#paintClientArea(Graphics)
 	 */
+	@Override
 	protected void paintClientArea(Graphics graphics) {
-		if (getChildren().isEmpty())
+		if (getChildren().isEmpty()) {
 			return;
-		if (scale == 1.0 && scaleMethod != EMULATED_SCALING) {
+		}
+		if ((scale == 1.0) && (scaleMethod != EMULATED_SCALING)) {
 			super.paintClientArea(graphics);
 		} else {
 			Graphics g = graphics;
 			if (EMULATED_SCALING == scaleMethod) {
 				g = new ScaledGraphics(graphics);
 			}
-			boolean optimizeClip = getBorder() == null || getBorder().isOpaque();
-			if (!optimizeClip)
-				g.clipRect(getBounds().getCropped(getInsets()));
+			if (!optimizeClip()) {
+				g.clipRect(getBounds().getShrinked(getInsets()));
+			}
 			g.translate(getBounds().x + getInsets().left, getBounds().y + getInsets().top);
 			g.scale(scale);
 			g.pushState();
@@ -58,6 +60,7 @@ public class ZoomFigure extends Figure implements ScalableFigure {
 	/*
 	 * @see org.eclipse.draw2d.ScalableFigure#getScale()
 	 */
+	@Override
 	public double getScale() {
 		return scale;
 	}
@@ -65,9 +68,11 @@ public class ZoomFigure extends Figure implements ScalableFigure {
 	/*
 	 * @see org.eclipse.draw2d.ScalableFigure#setScale(double)
 	 */
+	@Override
 	public void setScale(double newZoom) {
-		if (scale == newZoom)
+		if (scale == newZoom) {
 			return;
+		}
 		scale = newZoom;
 		repaint();
 	}
@@ -75,6 +80,7 @@ public class ZoomFigure extends Figure implements ScalableFigure {
 	/*
 	 * @see org.eclipse.draw2d.Figure#getClientArea()
 	 */
+	@Override
 	public Rectangle getClientArea(Rectangle rect) {
 		super.getClientArea(rect);
 		rect.width /= scale;
@@ -85,6 +91,7 @@ public class ZoomFigure extends Figure implements ScalableFigure {
 	/*
 	 * @see org.eclipse.draw2d.Figure#getPreferredSize(int, int)
 	 */
+	@Override
 	public Dimension getPreferredSize(int wHint, int hHint) {
 		Dimension d = super.getPreferredSize(wHint, hHint);
 		int w = getInsets().getWidth();
@@ -95,6 +102,7 @@ public class ZoomFigure extends Figure implements ScalableFigure {
 	/*
 	 * @see org.eclipse.draw2d.Figure#translateToParent(Translatable)
 	 */
+	@Override
 	public void translateToParent(Translatable t) {
 		t.performScale(scale);
 		super.translateToParent(t);
@@ -103,6 +111,7 @@ public class ZoomFigure extends Figure implements ScalableFigure {
 	/*
 	 * @see org.eclipse.draw2d.Figure#translateFromParent(Translatable)
 	 */
+	@Override
 	public void translateFromParent(Translatable t) {
 		super.translateFromParent(t);
 		t.performScale(1 / scale);
@@ -111,6 +120,7 @@ public class ZoomFigure extends Figure implements ScalableFigure {
 	/*
 	 * @see org.eclipse.draw2d.Figure#useLocalCoordinates()
 	 */
+	@Override
 	protected boolean useLocalCoordinates() {
 		return true;
 	}

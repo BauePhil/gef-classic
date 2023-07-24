@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2005 IBM Corporation and others.
+ * Copyright (c) 2005, 2023 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -9,8 +9,6 @@
  *     IBM Corporation - initial API and implementation
  *******************************************************************************/
 package org.eclipse.draw2d.examples.tree;
-
-import org.eclipse.swt.graphics.Color;
 
 import org.eclipse.draw2d.AbstractBorder;
 import org.eclipse.draw2d.Border;
@@ -25,9 +23,10 @@ import org.eclipse.draw2d.StackLayout;
 import org.eclipse.draw2d.geometry.Insets;
 import org.eclipse.draw2d.geometry.PointList;
 import org.eclipse.draw2d.geometry.Rectangle;
+import org.eclipse.swt.graphics.Color;
 
 /**
- * 
+ *
  * @author hudsonr Created on Apr 22, 2003
  */
 public class PageNode extends Figure {
@@ -59,18 +58,20 @@ public class PageNode extends Figure {
 
 		static final Insets insets = new Insets(CORNER_SIZE, 2, 4, 4);
 
+		@Override
 		public Insets getInsets(IFigure figure) {
 			return insets;
 		}
 
+		@Override
 		public void paint(IFigure figure, Graphics g, Insets insets) {
 			Rectangle r = getPaintRectangle(figure, insets);
 
 			g.setLineWidth(4);
 			r.resize(-2, -2);
 			g.setForegroundColor(shadow);
-			g.drawLine(r.x + 3, r.bottom(), r.right() - 1, r.bottom());
-			g.drawLine(r.right(), r.y + 3 + CORNER_SIZE, r.right(), r.bottom() - 1);
+			g.drawLine(r.x + 3, r.bottom(), r.right() + 3, r.bottom());
+			g.drawLine(r.right(), r.y + CORNER_SIZE, r.right(), r.bottom());
 
 			g.restoreState();
 			r.resize(-1, -1);
@@ -78,6 +79,7 @@ public class PageNode extends Figure {
 			g.setForegroundColor(blue);
 			g.drawRectangle(r.x + 1, r.y + 1, r.width - 2, r.height - 2);
 			g.translate(r.getTopRight());
+			g.translate(0, -1);
 			g.fillPolygon(CORNER_ERASE);
 			g.setBackgroundColor(corner1);
 			g.fillPolygon(CORNER_PAINT);
@@ -85,7 +87,7 @@ public class PageNode extends Figure {
 			g.drawPolygon(CORNER_PAINT);
 			g.restoreState();
 			g.setForegroundColor(corner2);
-			g.drawLine(r.right() - CORNER_SIZE + 1, r.y + 2, r.right() - 2, r.y + CORNER_SIZE - 1);
+			g.drawLine((r.right() - CORNER_SIZE) + 1, r.y + 2, r.right() - 2, (r.y + CORNER_SIZE) - 1);
 		}
 	}
 
@@ -105,6 +107,7 @@ public class PageNode extends Figure {
 	/**
 	 * @see org.eclipse.draw2d.Figure#paintFigure(org.eclipse.draw2d.Graphics)
 	 */
+	@Override
 	protected void paintFigure(Graphics g) {
 		super.paintFigure(g);
 		if (selected) {
@@ -119,16 +122,18 @@ public class PageNode extends Figure {
 
 	public void setSelected(boolean value) {
 		this.selected = value;
-		if (selected)
+		if (selected) {
 			label.setForegroundColor(ColorConstants.white);
-		else
+		} else {
 			label.setForegroundColor(null);
+		}
 		repaint();
 	}
 
 	/**
 	 * @see java.lang.Object#toString()
 	 */
+	@Override
 	public String toString() {
 		return ((Label) getChildren().get(0)).getText();
 	}

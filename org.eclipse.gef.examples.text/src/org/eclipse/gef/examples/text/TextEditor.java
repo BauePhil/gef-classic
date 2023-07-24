@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2004, 2010 IBM Corporation and others.
+ * Copyright (c) 2004, 2023 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -78,6 +78,35 @@ public class TextEditor extends GraphicalEditor {
 	private Container doc;
 	private StyleService styleService = new StyleService();
 
+	private static final class TextEditorEditPartFactory implements EditPartFactory {
+		@Override
+		public EditPart createEditPart(EditPart context, Object model) {
+			if (model instanceof Container cont) {
+				switch (cont.getType()) {
+				case Container.TYPE_ROOT:
+					return new DocumentPart(cont);
+				case Container.TYPE_IMPORT_DECLARATIONS:
+					return new ImportsPart(cont);
+
+				case Container.TYPE_COMMENT, Container.TYPE_PARAGRAPH:
+					return new BlockTextPart(cont);
+				case Container.TYPE_INLINE:
+					return new InlineTextPart(cont);
+				default:
+					throw new RuntimeException("unknown model type"); //$NON-NLS-1$
+				}
+			} else if (model instanceof TextRun textRun) {
+				switch (textRun.getType()) {
+				case TextRun.TYPE_IMPORT:
+					return new ImportPart(textRun);
+				default:
+					return new TextFlowPart(textRun);
+				}
+			}
+			throw new RuntimeException("unexpected model object"); //$NON-NLS-1$
+		}
+	}
+
 	class TextOutlinePage extends ContentOutlinePage {
 
 		public TextOutlinePage(EditPartViewer viewer) {
@@ -89,20 +118,23 @@ public class TextEditor extends GraphicalEditor {
 			treeViewer.setEditDomain(domain);
 			getSelectionSynchronizer().addViewer(treeViewer);
 			treeViewer.setEditPartFactory(new EditPartFactory() {
+				@Override
 				public EditPart createEditPart(EditPart context, Object model) {
-					if (model instanceof Container)
-						return new ContainerTreePart(model);
+					if (model instanceof Container cont)
+						return new ContainerTreePart(cont);
 					return new TextRunTreePart(model);
 				}
 			});
 		}
 
+		@Override
 		public void createControl(Composite parent) {
 			super.createControl(parent);
 			getViewer().setContents(doc);
 		}
 	}
 
+	@Override
 	public void commandStackChanged(EventObject event) {
 		firePropertyChange(PROP_DIRTY);
 		super.commandStackChanged(event);
@@ -111,6 +143,7 @@ public class TextEditor extends GraphicalEditor {
 	/**
 	 * @see org.eclipse.gef.ui.parts.GraphicalEditor#configureGraphicalViewer()
 	 */
+	@Override
 	protected void configureGraphicalViewer() {
 		super.configureGraphicalViewer();
 		doc.getStyle().setParentStyle(new CanvasStyle(getGraphicalViewer().getControl()));
@@ -129,6 +162,7 @@ public class TextEditor extends GraphicalEditor {
 	/**
 	 * @see org.eclipse.gef.ui.parts.GraphicalEditor#createActions()
 	 */
+	@Override
 	protected void createActions() {
 		super.createActions();
 		IKeyBindingService service = getSite().getKeyBindingService();
@@ -171,6 +205,7 @@ public class TextEditor extends GraphicalEditor {
 	/**
 	 * @see org.eclipse.gef.ui.parts.GraphicalEditor#createGraphicalViewer(org.eclipse.swt.widgets.Composite)
 	 */
+	@Override
 	protected void createGraphicalViewer(Composite parent) {
 		GraphicalViewer viewer = new GraphicalTextViewer();
 		viewer.createControl(parent);
@@ -196,35 +231,9 @@ public class TextEditor extends GraphicalEditor {
 	/**
 	 * @see GraphicalEditor#initializeGraphicalViewer()
 	 */
+	@Override
 	protected void initializeGraphicalViewer() {
-		getGraphicalViewer().setEditPartFactory(new EditPartFactory() {
-			public EditPart createEditPart(EditPart context, Object model) {
-				if (model instanceof Container) {
-					switch (((Container) model).getType()) {
-					case Container.TYPE_ROOT:
-						return new DocumentPart(model);
-					case Container.TYPE_IMPORT_DECLARATIONS:
-						return new ImportsPart(model);
-
-					case Container.TYPE_COMMENT:
-					case Container.TYPE_PARAGRAPH:
-						return new BlockTextPart(model);
-					case Container.TYPE_INLINE:
-						return new InlineTextPart(model);
-					default:
-						throw new RuntimeException("unknown model type");
-					}
-				} else if (model instanceof TextRun) {
-					switch (((TextRun) model).getType()) {
-					case TextRun.TYPE_IMPORT:
-						return new ImportPart(model);
-					default:
-						return new TextFlowPart(model);
-					}
-				}
-				throw new RuntimeException("unexpected model object");
-			}
-		});
+		getGraphicalViewer().setEditPartFactory(new TextEditorEditPartFactory());
 
 		getGraphicalViewer().setContents(doc);
 	}
@@ -232,6 +241,7 @@ public class TextEditor extends GraphicalEditor {
 	/**
 	 * @see org.eclipse.ui.ISaveablePart#doSave(org.eclipse.core.runtime.IProgressMonitor)
 	 */
+	@Override
 	public void doSave(IProgressMonitor monitor) {
 		try {
 			ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
@@ -250,15 +260,18 @@ public class TextEditor extends GraphicalEditor {
 	/**
 	 * @see org.eclipse.ui.ISaveablePart#doSaveAs()
 	 */
+	@Override
 	public void doSaveAs() {
 	}
 
 	/**
 	 * @see GraphicalEditor#init(IEditorSite, IEditorInput)
 	 */
+	@Override
 	public void init(IEditorSite site, IEditorInput input) throws PartInitException {
 		setEditDomain(new DefaultEditDomain(this));
 		getCommandStack().addCommandStackEventListener(new CommandStackEventListener() {
+			@Override
 			public void stackChanged(CommandStackEvent event) {
 				TextCommand command = (TextCommand) event.getCommand();
 				if (command != null) {
@@ -285,10 +298,12 @@ public class TextEditor extends GraphicalEditor {
 	/**
 	 * @see org.eclipse.ui.ISaveablePart#isSaveAsAllowed()
 	 */
+	@Override
 	public boolean isSaveAsAllowed() {
 		return false;
 	}
 
+	@Override
 	protected void setInput(IEditorInput input) {
 		super.setInput(input);
 
@@ -307,30 +322,29 @@ public class TextEditor extends GraphicalEditor {
 		if (doc == null) {
 			doc = new Block(Container.TYPE_ROOT);
 			Container preface = new Block(Container.TYPE_PARAGRAPH);
-			preface.add(new TextRun("package org.eclipse.gef.examples.text"));
+			preface.add(new TextRun("package org.eclipse.gef.examples.text")); //$NON-NLS-1$
 			doc.add(preface);
 			Container imports = new Block(Container.TYPE_IMPORT_DECLARATIONS);
 			doc.add(imports);
-			imports.add(new TextRun("org.eclipse.draw2d", TextRun.TYPE_IMPORT));
-			imports.add(new TextRun("org.eclipse.gef", TextRun.TYPE_IMPORT));
+			imports.add(new TextRun("org.eclipse.draw2d", TextRun.TYPE_IMPORT)); //$NON-NLS-1$
+			imports.add(new TextRun("org.eclipse.gef", TextRun.TYPE_IMPORT)); //$NON-NLS-1$
 			// for (int i = 0; i < 400; i++) {
 			Container block = new Block(Container.TYPE_COMMENT);
 			block.add(
-					new TextRun("Copyright (c) 2005 IBM Corporation and others. All rights reserved. This program and "
-							+ "the accompanying materials are made available under the terms of the Eclipse Public "
-							+ "License v1.0 which accompanies this distribution, and is available at "
-							+ "http://www.eclipse.org/legal/epl-v10.html (\u7325\u7334\u7329\u7325\u7334\u7329\u7325\u7334\u7329\u7325\u7334\u7329\u7325\u7334\u7329\u7325\u7334\u7329\u7325\u7334\u7329\u7325\u7334\u7329\u7325\u7334\u7329\u7325\u7334\u7329\u7325\u7334\u7329\u7325\u7334\u7329\u7325\u7334\u7329\u7325\u7334\u7329\u7325\u7334\u7329\u7325\u7334\u7329\u7325\u7334\u7329\u7325\u7334\u7329\u7325\u7334\u7329\u7325\u7334\u7329\u7325\u7334\u7329\u7325\u7334\u7329\u7325\u7334\u7329\u7325\u7334\u7329\u7325\u7334\u7329\u7325\u7334\u7329)\r\n"
-							+ "Contributors:\n    IBM Corporation - initial API and implementation\n"
-							+ "\u0630\u0628\u063a \u0634\u0635\u062c\u062d (Saeed Anwar) - \u0634\u0635\u062c\u062d "
-							+ "\u0638\u0635\u0634\u0637\u0635\u0639\u0633 \u0635\u0639\u0633\u0640 \u0630\u0628\u063a (Bug 113700)"));
+					new TextRun("Copyright (c) 2005 IBM Corporation and others. All rights reserved. This program and " //$NON-NLS-1$
+							+ "the accompanying materials are made available under the terms of the Eclipse Public " //$NON-NLS-1$
+							+ "License v1.0 which accompanies this distribution, and is available at " //$NON-NLS-1$
+							+ "http://www.eclipse.org/legal/epl-v10.html (\u7325\u7334\u7329\u7325\u7334\u7329\u7325\u7334\u7329\u7325\u7334\u7329\u7325\u7334\u7329\u7325\u7334\u7329\u7325\u7334\u7329\u7325\u7334\u7329\u7325\u7334\u7329\u7325\u7334\u7329\u7325\u7334\u7329\u7325\u7334\u7329\u7325\u7334\u7329\u7325\u7334\u7329\u7325\u7334\u7329\u7325\u7334\u7329\u7325\u7334\u7329\u7325\u7334\u7329\u7325\u7334\u7329\u7325\u7334\u7329\u7325\u7334\u7329\u7325\u7334\u7329\u7325\u7334\u7329\u7325\u7334\u7329\u7325\u7334\u7329\u7325\u7334\u7329)\r\n" //$NON-NLS-1$
+							+ "Contributors:\n    IBM Corporation - initial API and implementation\n" //$NON-NLS-1$
+							+ "\u0630\u0628\u063a \u0634\u0635\u062c\u062d (Saeed Anwar) - \u0634\u0635\u062c\u062d " //$NON-NLS-1$
+							+ "\u0638\u0635\u0634\u0637\u0635\u0639\u0633 \u0635\u0639\u0633\u0640 \u0630\u0628\u063a (Bug 113700)")); //$NON-NLS-1$
 			doc.add(block);
 
 			Container code = new Block(Container.TYPE_PARAGRAPH);
-			code.getStyle().setFontFamily("Courier New");
+			code.getStyle().setFontFamily("Courier New"); //$NON-NLS-1$
 			doc.add(code);
-			code.add(new TextRun(
-					"public void countToANumber(int limit) {\n" + "    for (int i = 0; i < limit; i++)\n"
-							+ "        System.out.println(\"Counting: \" + i); //$NON-NLS-1$\n\n" + "}",
+			code.add(new TextRun("public void countToANumber(int limit) {\n" + "    for (int i = 0; i < limit; i++)\n" //$NON-NLS-1$ //$NON-NLS-2$
+					+ "        System.out.println(\"Counting: \" + i); //$NON-NLS-1$\n\n" + "}", //$NON-NLS-1$ //$NON-NLS-2$
 					TextRun.TYPE_CODE));
 			// }
 		}

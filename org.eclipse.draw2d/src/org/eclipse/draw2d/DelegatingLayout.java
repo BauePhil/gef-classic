@@ -11,7 +11,6 @@
 package org.eclipse.draw2d;
 
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import org.eclipse.draw2d.geometry.Dimension;
@@ -25,7 +24,7 @@ import org.eclipse.draw2d.geometry.Dimension;
  */
 public class DelegatingLayout extends AbstractLayout {
 
-	private Map constraints = new HashMap();
+	private Map<IFigure, Object> constraints = new HashMap<>();
 
 	/**
 	 * Calculates the preferred size of the given Figure. For the DelegatingLayout,
@@ -38,18 +37,15 @@ public class DelegatingLayout extends AbstractLayout {
 	 * @since 2.0
 	 */
 	protected Dimension calculatePreferredSize(IFigure parent, int wHint, int hHint) {
-		List children = parent.getChildren();
 		Dimension d = new Dimension();
-		for (int i = 0; i < children.size(); i++) {
-			IFigure child = (IFigure) children.get(i);
-			d.union(child.getPreferredSize());
-		}
+		parent.getChildren().forEach(child -> d.union(child.getPreferredSize()));
 		return d;
 	}
 
 	/**
 	 * @see org.eclipse.draw2d.LayoutManager#getConstraint(org.eclipse.draw2d.IFigure)
 	 */
+	@Override
 	public Object getConstraint(IFigure child) {
 		return constraints.get(child);
 	}
@@ -61,9 +57,7 @@ public class DelegatingLayout extends AbstractLayout {
 	 * @param parent the figure whose children should be layed out
 	 */
 	public void layout(IFigure parent) {
-		List children = parent.getChildren();
-		for (int i = 0; i < children.size(); i++) {
-			IFigure child = (IFigure) children.get(i);
+		for (IFigure child : parent.getChildren()) {
 			Locator locator = (Locator) constraints.get(child);
 			if (locator != null) {
 				locator.relocate(child);
@@ -76,6 +70,7 @@ public class DelegatingLayout extends AbstractLayout {
 	 * 
 	 * @param child the child being removed
 	 */
+	@Override
 	public void remove(IFigure child) {
 		constraints.remove(child);
 	}
@@ -86,6 +81,7 @@ public class DelegatingLayout extends AbstractLayout {
 	 * @param figure     the figure whose contraint is being set
 	 * @param constraint the new constraint
 	 */
+	@Override
 	public void setConstraint(IFigure figure, Object constraint) {
 		super.setConstraint(figure, constraint);
 		if (constraint != null)

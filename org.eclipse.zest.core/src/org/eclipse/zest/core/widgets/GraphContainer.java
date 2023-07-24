@@ -1,11 +1,11 @@
 /*******************************************************************************
- * Copyright 2005-2007, CHISEL Group, University of Victoria, Victoria, BC,
+ * Copyright 2005-2007, 2023, CHISEL Group, University of Victoria, Victoria, BC,
  * Canada. All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
  * accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  * 
- * Contributors: The Chisel Group, University of Victoria
+ * Contributors: The Chisel Group, University of Victoria, Sebastian Hollersbacher
  ******************************************************************************/
 package org.eclipse.zest.core.widgets;
 
@@ -45,6 +45,8 @@ import org.eclipse.zest.layouts.algorithms.TreeLayoutAlgorithm;
  * properties as the nodes. Containers cannot have custom figures.
  * 
  * @author Ian Bull
+ * 
+ * @author Sebastian Hollersbacher
  */
 public class GraphContainer extends GraphNode implements IContainer {
 
@@ -135,11 +137,15 @@ public class GraphContainer extends GraphNode implements IContainer {
 		scrollPane.setVisible(false);
 		// setSize(expandGraphLabel.getSize().width,
 		// expandGraphLabel.getSize().height);
-		List children = this.zestLayer.getChildren();
-		for (Iterator iterator = children.iterator(); iterator.hasNext();) {
-			IFigure child = (IFigure) iterator.next();
+		for (IFigure child : zestLayer.getChildren()) {
 			GraphItem item = getGraph().getGraphItem(child);
 			item.setVisible(false);
+			if (item instanceof GraphNode) { // refresh nodes in container if closed
+				HideNodeHelper hideNodeHelper = ((GraphNode) item).getHideNodeHelper();
+				if (hideNodeHelper != null) {
+					hideNodeHelper.resetCounter();
+				}
+			}
 		}
 		Rectangle containerBounds = new Rectangle(this.getLocation(),
 				new Dimension(this.getSize().width, CONTAINER_HEIGHT + this.expandGraphLabel.getSize().height));
@@ -148,7 +154,7 @@ public class GraphContainer extends GraphNode implements IContainer {
 			Animation.run(ANIMATION_TIME);
 		}
 		// this.nodeFigure.getUpdateManager().performUpdate();
-		updateFigureForModel(nodeFigure);
+		updateFigureForModel(getModelFigure());
 	}
 
 	private static void addNodeToOrderedList(List orderedNodeList, GraphNode node) {
@@ -307,14 +313,12 @@ public class GraphContainer extends GraphNode implements IContainer {
 		// expandGraphLabel.getSize().height + expandedHeight -
 		// SUBLAYER_OFFSET);
 
-		List children = this.zestLayer.getChildren();
-		for (Iterator iterator = children.iterator(); iterator.hasNext();) {
-			IFigure child = (IFigure) iterator.next();
+		for (IFigure child : this.zestLayer.getChildren()) {
 			GraphItem item = getGraph().getGraphItem(child);
 			item.setVisible(true);
 		}
 
-		updateFigureForModel(nodeFigure);
+		updateFigureForModel(getModelFigure());
 
 		Rectangle containerBounds = new Rectangle(this.getLocation(),
 				new Dimension(this.getSize().width, CONTAINER_HEIGHT + this.expandGraphLabel.getSize().height));
@@ -601,11 +605,27 @@ public class GraphContainer extends GraphNode implements IContainer {
 		this.scalledLayer.setScale(scale);
 	}
 
+	@Override
+	protected Rectangle getHideContainerBounds() {
+		Point loc = getLocation();
+		ContainerDimension containerDimension = computeContainerSize();
+		Dimension size = new Dimension(containerDimension.width + 2 * HideNodeHelper.MARGIN,
+				containerDimension.labelHeight + 2 * HideNodeHelper.MARGIN);
+		return new Rectangle(loc, size);
+	}
+
 	/***************************************************************************
 	 * NON API MEMBERS
 	 **************************************************************************/
 	protected void initFigure() {
-		nodeFigure = createContainerFigure();
+		setModelFigure(createContainerFigure());
+		if (graph.getHideNodesEnabled()) {
+			nodeFigure = new ContainerFigure();
+			nodeFigure.add(getModelFigure());
+			setHideNodeHelper(new HideNodeHelper(this));
+		} else {
+			nodeFigure = getModelFigure();
+		}
 	}
 
 	/**
@@ -793,12 +813,12 @@ public class GraphContainer extends GraphNode implements IContainer {
 
 	}
 
+	@Override
 	protected void refreshLocation() {
 		if (nodeFigure == null || nodeFigure.getParent() == null) {
 			return; // node figure has not been created yet
 		}
-		GraphNode node = this;
-		Point loc = node.getLocation();
+		Point loc = getLocation();
 
 		ContainerDimension containerDimension = computeContainerSize();
 		Dimension size = new Dimension();
@@ -818,10 +838,15 @@ public class GraphContainer extends GraphNode implements IContainer {
 				expandGraphLabel.getLocation().y + containerDimension.labelHeight - SUBLAYER_OFFSET));
 		scrollPane.setSize(computeChildArea());
 		scalledLayer.setScale(computeWidthScale(), computeHeightScale());
+		if (getHideNodeHelper() != null) {
+			bounds.width += 2 * HideNodeHelper.MARGIN;
+			bounds.height += 2 * HideNodeHelper.MARGIN;
+			getHideNodeHelper().updateNodeBounds(bounds);
+		}
 	}
 
 	void addConnectionFigure(PolylineConnection connection) {
-		nodeFigure.add(connection);
+		getModelFigure().add(connection);
 		// zestLayer.addConnection(connection);
 	}
 

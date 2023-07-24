@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2010 IBM Corporation and others.
+ * Copyright (c) 2000, 2023 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -22,25 +22,33 @@ import org.eclipse.draw2d.geometry.Translatable;
  * @author Eric Bordeau
  * @since 2.1.1
  */
-public class ScalableLayeredPane extends LayeredPane implements ScalableFigure {
+public class ScalableLayeredPane extends LayeredPane implements IScalablePane {
 
 	private double scale = 1.0;
 
-	/**
-	 * @see IFigure#getClientArea(Rectangle)
-	 */
-	public Rectangle getClientArea(Rectangle rect) {
-		super.getClientArea(rect);
-		rect.width /= scale;
-		rect.height /= scale;
-		rect.x /= scale;
-		rect.y /= scale;
-		return rect;
+	private final boolean useScaledGraphics;
+
+	public ScalableLayeredPane() {
+		this(true);
 	}
 
 	/**
-	 * @see Figure#getPreferredSize(int, int)
+	 * Constructor which allows to configure if scaled graphics should be used.
+	 * 
+	 * @since 3.13
 	 */
+	public ScalableLayeredPane(boolean useScaledGraphics) {
+		this.useScaledGraphics = useScaledGraphics;
+	}
+
+	/** @see IFigure#getClientArea(Rectangle) */
+	@Override
+	public Rectangle getClientArea(Rectangle rect) {
+		return getScaledRect(super.getClientArea(rect));
+	}
+
+	/** @see Figure#getMinimumSize(int, int) */
+	@Override
 	public Dimension getMinimumSize(int wHint, int hHint) {
 		Dimension d = super.getMinimumSize(wHint != SWT.DEFAULT ? (int) (wHint / getScale()) : SWT.DEFAULT,
 				hHint != SWT.DEFAULT ? (int) (hHint / getScale()) : SWT.DEFAULT);
@@ -49,9 +57,8 @@ public class ScalableLayeredPane extends LayeredPane implements ScalableFigure {
 		return d.getExpanded(-w, -h).scale(scale).expand(w, h);
 	}
 
-	/**
-	 * @see Figure#getPreferredSize(int, int)
-	 */
+	/** @see Figure#getPreferredSize(int, int) */
+	@Override
 	public Dimension getPreferredSize(int wHint, int hHint) {
 		Dimension d = super.getPreferredSize(wHint != SWT.DEFAULT ? (int) (wHint / getScale()) : SWT.DEFAULT,
 				hHint != SWT.DEFAULT ? (int) (hHint / getScale()) : SWT.DEFAULT);
@@ -65,36 +72,34 @@ public class ScalableLayeredPane extends LayeredPane implements ScalableFigure {
 	 * 
 	 * @return the scale level
 	 */
+	@Override
 	public double getScale() {
 		return scale;
 	}
 
-	/**
-	 * @see org.eclipse.draw2d.IFigure#isCoordinateSystem()
-	 */
-	public boolean isCoordinateSystem() {
-		return true;
-	}
-
-	/**
-	 * @see org.eclipse.draw2d.Figure#paintClientArea(Graphics)
-	 */
+	/** @see org.eclipse.draw2d.Figure#paintClientArea(Graphics) */
+	@Override
 	protected void paintClientArea(Graphics graphics) {
 		if (getChildren().isEmpty())
 			return;
+
 		if (scale == 1.0) {
 			super.paintClientArea(graphics);
 		} else {
-			ScaledGraphics g = new ScaledGraphics(graphics);
-			boolean optimizeClip = getBorder() == null || getBorder().isOpaque();
-			if (!optimizeClip)
-				g.clipRect(getBounds().getCropped(getInsets()));
-			g.scale(scale);
-			g.pushState();
-			paintChildren(g);
-			g.dispose();
-			graphics.restoreState();
+			Graphics graphicsToUse = IScalablePaneHelper.prepareScaledGraphics(graphics, this);
+			paintChildren(graphicsToUse);
+			IScalablePaneHelper.cleanupScaledGraphics(graphics, graphicsToUse);
 		}
+	}
+
+	/**
+	 * Make this method publicly accessible for IScaleablePane.
+	 * 
+	 * @since 3.13
+	 */
+	@Override
+	public boolean optimizeClip() {
+		return super.optimizeClip();
 	}
 
 	/**
@@ -102,6 +107,7 @@ public class ScalableLayeredPane extends LayeredPane implements ScalableFigure {
 	 * 
 	 * @param newZoom The new zoom level
 	 */
+	@Override
 	public void setScale(double newZoom) {
 		if (scale == newZoom)
 			return;
@@ -112,17 +118,29 @@ public class ScalableLayeredPane extends LayeredPane implements ScalableFigure {
 	}
 
 	/**
-	 * @see org.eclipse.draw2d.Figure#translateFromParent(Translatable)
+	 * @since 3.13
 	 */
-	public void translateFromParent(Translatable t) {
-		t.performScale(1 / scale);
+	@Override
+	public boolean useScaledGraphics() {
+		return useScaledGraphics;
 	}
 
-	/**
-	 * @see org.eclipse.draw2d.Figure#translateToParent(Translatable)
-	 */
+	/** @see org.eclipse.draw2d.Figure#translateToParent(Translatable) */
+	@Override
 	public void translateToParent(Translatable t) {
-		t.performScale(scale);
+		t.performScale(getScale());
+	}
+
+	/** @see org.eclipse.draw2d.Figure#translateFromParent(Translatable) */
+	@Override
+	public void translateFromParent(Translatable t) {
+		t.performScale(1 / getScale());
+	}
+
+	/** @see org.eclipse.draw2d.IFigure#isCoordinateSystem() */
+	@Override
+	public boolean isCoordinateSystem() {
+		return true;
 	}
 
 }

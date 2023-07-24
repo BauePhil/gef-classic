@@ -1,11 +1,11 @@
 /*******************************************************************************
- * Copyright 2005, CHISEL Group, University of Victoria, Victoria, BC, Canada.
+ * Copyright 2005, 2023, CHISEL Group, University of Victoria, Victoria, BC, Canada.
  * All rights reserved. This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License v1.0 which
  * accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  *
- * Contributors: The Chisel Group, University of Victoria
+ * Contributors: The Chisel Group, University of Victoria, Sebastian Hollersbacher
  ******************************************************************************/
 package org.eclipse.zest.core.widgets;
 
@@ -646,8 +646,8 @@ public class GraphConnection extends GraphItem {
 			// If this is a self loop, create a looped arc and put the locator
 			// at the top
 			// of the connection
-			sourceAnchor = new LoopAnchor(getSource().getNodeFigure());
-			targetAnchor = new LoopAnchor(getDestination().getNodeFigure());
+			sourceAnchor = new LoopAnchor(getSource().getFigure());
+			targetAnchor = new LoopAnchor(getDestination().getFigure());
 			labelLocator = new MidpointLocator(connectionFigure, 0) {
 				protected Point getReferencePoint() {
 					Point p = Point.SINGLETON;
@@ -663,8 +663,8 @@ public class GraphConnection extends GraphItem {
 				((PolylineArcConnection) connectionFigure)
 						.setDepth(this.curveDepth);
 			}
-			sourceAnchor = new RoundedChopboxAnchor(getSource().getNodeFigure(), 8);
-			targetAnchor = new RoundedChopboxAnchor(getDestination().getNodeFigure(), 8);
+			sourceAnchor = new RoundedChopboxAnchor(getSource().getFigure(), 8);
+			targetAnchor = new RoundedChopboxAnchor(getDestination().getFigure(), 8);
 			labelLocator = new MidpointLocator(connectionFigure, 0);
 		}
 

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2010 IBM Corporation and others.
+ * Copyright (c) 2000, 2022 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -114,7 +114,7 @@ public class DrawerFigure extends Figure {
 			// draw top border of drawer figure
 			g.setForegroundColor(PaletteColorUtil.WIDGET_NORMAL_SHADOW);
 			g.drawLine(r.getTopLeft(), r.getTopRight());
-			g.setForegroundColor(ColorConstants.white);
+			g.setForegroundColor(ColorConstants.listBackground);
 			g.drawLine(r.getTopLeft().getTranslated(0, 1), r.getTopRight().getTranslated(0, 1));
 			r.crop(new Insets(2, 0, 0, 0));
 			if (isExpanded()) {
@@ -125,7 +125,7 @@ public class DrawerFigure extends Figure {
 
 			// draw bottom border of drawer figure
 			if (!isExpanded()) {
-				g.setForegroundColor(ColorConstants.white);
+				g.setForegroundColor(ColorConstants.listBackground);
 				g.drawLine(r.getBottomLeft().getTranslated(0, -1), r.getBottomRight().getTranslated(0, -1));
 				r.crop(new Insets(0, 0, 1, 0));
 			}
@@ -337,6 +337,7 @@ public class DrawerFigure extends Figure {
 	/**
 	 * @see Figure#getMinimumSize(int, int)
 	 */
+	@Override
 	public Dimension getMinimumSize(int wHint, int hHint) {
 		/*
 		 * Fix related to Bug #35176 The figure returns a minimum size that is of at
@@ -344,11 +345,11 @@ public class DrawerFigure extends Figure {
 		 * (in which case, the scrollbars cover up the entire available space).
 		 */
 		if (isExpanded()) {
-			List children = getContentPane().getChildren();
+			List<? extends IFigure> children = getContentPane().getChildren();
 			if (!children.isEmpty()) {
 				Dimension result = collapseToggle.getPreferredSize(wHint, hHint).getCopy();
 				result.height += getContentPane().getInsets().getHeight();
-				IFigure child = (IFigure) children.get(0);
+				IFigure child = children.get(0);
 				result.height += Math.min(80, child.getPreferredSize(wHint, -1).height + 9);
 				return result.intersect(getPreferredSize(wHint, hHint));
 			}

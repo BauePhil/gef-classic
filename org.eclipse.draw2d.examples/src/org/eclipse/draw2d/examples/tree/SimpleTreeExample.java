@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2005 IBM Corporation and others.
+ * Copyright (c) 2005, 2023 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -25,23 +25,20 @@ public class SimpleTreeExample extends AbstractExample {
 	}
 
 	/**
-	 * @see org.eclipse.draw2d.examples.AbstractExample#getContents()
+	 * @see org.eclipse.draw2d.examples.AbstractExample#createContents()
 	 */
-	protected IFigure getContents() {
+	@Override
+	protected IFigure createContents() {
 		getFigureCanvas().setBackground(ColorConstants.white);
-		TreeRoot root = new TreeRoot(new PageNode("Graph Root"));
+		TreeRoot root = new TreeRoot(new PageNode("Graph Root")); //$NON-NLS-1$
 		root.setAlignment(PositionConstants.LEFT);
 
-		TreeBranch branch;
-		root.getContentsPane().add(branch = new TreeBranch(new PageNode("Child 1")));
+		TreeBranch branch = new TreeBranch(new PageNode("Child 1")); //$NON-NLS-1$
+		root.addBranch(branch);
 
-//	branch.getContentsPane().add(new TreeBranch(new PageNode("Child 1")));
-//	branch.getContentsPane().add(new TreeBranch(new PageNode("Child 2")));
-
-//	root.getContentsPane().add(new TreeBranch(new PageNode("Child 2")));
-		root.getContentsPane().add(branch = new TreeBranch(new PageNode("Child 2"), TreeBranch.STYLE_HANGING));
-		branch.getContentsPane().add(new TreeBranch(new PageNode("Child 1")));
-//	branch.getContentsPane().add(new TreeBranch(new PageNode("Child 2")));
+		branch = new TreeBranch(new PageNode("Child 2"), TreeBranch.STYLE_HANGING); //$NON-NLS-1$
+		root.addBranch(branch);
+		branch.addBranch(new TreeBranch(new PageNode("Child 1"))); //$NON-NLS-1$
 
 		return root;
 	}

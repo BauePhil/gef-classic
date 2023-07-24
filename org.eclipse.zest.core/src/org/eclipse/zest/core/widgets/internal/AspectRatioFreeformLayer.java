@@ -184,6 +184,7 @@ public class AspectRatioFreeformLayer extends FreeformLayer implements ScalableF
 	// return true;
 	// }
 
+	@Override
 	protected void paintClientArea(Graphics graphics) {
 
 		if (getChildren().isEmpty()) {
@@ -199,8 +200,7 @@ public class AspectRatioFreeformLayer extends FreeformLayer implements ScalableF
 			disposeGraphics = true;
 		}
 
-		boolean optimizeClip = getBorder() == null || getBorder().isOpaque();
-		if (!optimizeClip) {
+		if (!optimizeClip()) {
 			g.clipRect(getBounds().getShrinked(getInsets()));
 		}
 
